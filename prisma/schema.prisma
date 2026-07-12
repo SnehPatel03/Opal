@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String          @id @default(uuid()) @db.Uuid
+  email          String          @unique
+  firstname      String?
+  lastname       String?
+  createdAt      DateTime        @default(now())
+  clerkid        String          @unique
+  image          String
+  trial          Boolean         @default(false)
+
+  studio         Media?
+  workspace      Workspace[]
+  videos         Video[]
+  subscription   Subscription?
+  members        Member[]
+  notification   Notification[]
+  sender         Invite[]        @relation("sender")
+  receiver       Invite[]        @relation("receiver")
+}
+
+model Subscription {
+  id          String              @id @default(uuid()) @db.Uuid
+  User        User                @relation(fields: [userId], references: [id])
+  userId      String              @unique @db.Uuid
+  createdAt   DateTime            @default(now())
+  plan        SUBSCRIPTION_PLAN   @default(FREE)
+  updatedAt   DateTime            @updatedAt
+  customerId  String?             @unique
+}
+
+model Media {
+  id       String   @id @default(uuid()) @db.Uuid
+  screen   String?
+  mic      String?
+  camera   String?
+  preset   PRESET   @default(SD)
+
+  User     User?    @relation(fields: [userId], references: [id])
+  userId   String   @unique @db.Uuid
+}
+
+model Member {
+  id           String      @id @default(uuid()) @db.Uuid
+  User         User        @relation(fields: [userId], references: [id])
+  userId       String      @db.Uuid
+  createdAt    DateTime    @default(now())
+  members      Boolean     @default(true)
+
+  Workspace    Workspace?  @relation(fields: [workspaceId], references: [id])
+  workspaceId  String?     @db.Uuid
+}
+
+model Folder {
+  id           String      @id @default(uuid()) @db.Uuid
+  name         String      @default("untitled Folder")
+  createdAt    DateTime    @default(now())
+
+  Workspace    Workspace?  @relation(fields: [workspaceId], references: [id])
+  workspaceId  String?     @db.Uuid
+
+  videos       Video[]
+}
+
+model Notification {
+  id       String   @id @default(uuid()) @db.Uuid
+  User     User?    @relation(fields: [userId], references: [id])
+  userId   String?  @db.Uuid
+  content  String
+}
+
+model Invite {
+  id           String      @id @default(uuid()) @db.Uuid
+
+  sender       User        @relation("sender", fields: [senderId], references: [id])
+  senderId     String      @db.Uuid
+
+  receiver     User        @relation("receiver", fields: [receiverId], references: [id])
+  receiverId   String      @db.Uuid
+
+  content      String
+
+  workspace    Workspace?  @relation(fields: [workspaceId], references: [id])
+  workspaceId  String      @db.Uuid
+
+  accepted     Boolean     @default(false)
+}
+
+model Workspace {
+  id         String      @id @default(uuid()) @db.Uuid
+  type       Type
+  name       String
+  createdAt  DateTime    @default(now())
+
+  User       User?       @relation(fields: [userId], references: [id])
+  userId     String?     @db.Uuid
+
+  folder     Folder[]
+  videos     Video[]
+  members    Member[]
+  invite     Invite[]
+}
+
+model Video {
+  id            String      @id @default(uuid()) @db.Uuid
+  title         String?     @default("Untitled Video")
+  description   String?     @default("No Description")
+  source        String      @unique
+  createdAt     DateTime    @default(now())
+
+  Folder        Folder?     @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId      String?     @db.Uuid
+
+  User          User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String?     @db.Uuid
+
+  Workspace     Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId   String?     @db.Uuid
+
+  processing    Boolean     @default(true)
+  views         Int         @default(0)
+  summery       String?
+}
+
+enum SUBSCRIPTION_PLAN {
+  PRO
+  FREE
+}
+
+enum PRESET {
+  SD
+  HD
+}
+
+enum Type {
+  PERSONAL
+  PUBLIC
+}

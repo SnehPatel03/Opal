@@ -18,7 +18,9 @@ import {
 import { getWorkspaces } from "@/actions/workspace";
 import { userQueryData } from "@/hooks/userQueryData";
 import { WorkspaceProps } from "@/types/index.type";
-import Modal from "../Modal";
+import { Modal } from "../Modal";
+import { PlusCircle } from "lucide-react";
+import SearchWorkspaceMember from "../SearchWorkspaceMember";
 
 type Props = {
   activeWorkspaceId: string;
@@ -27,10 +29,7 @@ type Props = {
 const Sidebar = ({ activeWorkspaceId }: Props) => {
   const router = useRouter();
 
-  const { data, isFetched } = userQueryData(
-    ["user-workspaces"],
-    getWorkspaces
-  );
+  const { data, isFetched } = userQueryData(["user-workspaces"], getWorkspaces);
 
   const workspace = (data as WorkspaceProps | undefined)?.data;
 
@@ -40,14 +39,12 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const selectedWorkspaceName = useMemo(() => {
     if (!workspace) return "";
 
-    const own = workspace.workspace.find(
-      (w) => w.id === selectedWorkspaceId
-    );
+    const own = workspace.workspace.find((w) => w.id === selectedWorkspaceId);
 
     if (own) return own.name;
 
     const member = workspace.members.find(
-      (m) => m.Workspace.id === selectedWorkspaceId
+      (m) => m.Workspace.id === selectedWorkspaceId,
     );
 
     return member?.Workspace.name ?? "";
@@ -97,33 +94,43 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 ))}
             </SelectGroup>
 
-            {workspace &&
-              workspace.members.length > 0 && (
-                <>
-                  <SelectSeparator />
+            {workspace && workspace.members.length > 0 && (
+              <>
+                <SelectSeparator />
 
-                  <SelectGroup>
-                    <SelectLabel>
-                      Member Workspaces ({workspace.members.length})
-                    </SelectLabel>
+                <SelectGroup>
+                  <SelectLabel>
+                    Member Workspaces ({workspace.members.length})
+                  </SelectLabel>
 
-                    {workspace.members.map((member) => (
-                      <SelectItem
-                        key={member.Workspace.id}
-                        value={member.Workspace.id}
-                      >
-                        {member.Workspace.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </>
-              )}
+                  {workspace.members.map((member) => (
+                    <SelectItem
+                      key={member.Workspace.id}
+                      value={member.Workspace.id}
+                    >
+                      {member.Workspace.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </>
+            )}
           </SelectContent>
         </Select>
-        <Modal>
 
+        <Modal
+          title="Invite To Workspace"
+          description="Invite other users to your workspace"
+          trigger={
+            <span className="flex  mt-3 w-[15vw] cursor-pointer items-center justify-center gap-2 rounded-md border border-neutral-800/90  bg-neutral-900 px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-neutral-800 ">
+              <PlusCircle size={16} className="text-neutral-400" />
+              <span>Invite To Workspace</span>
+            </span>
+          }
+        >
+          <div className="space-y-4">
+            <SearchWorkspaceMember/>
+          </div>
         </Modal>
-
       </div>
     </aside>
   );

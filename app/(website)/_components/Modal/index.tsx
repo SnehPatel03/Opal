@@ -1,11 +1,43 @@
-import React from 'react'
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-type Props = {}
+type Props = {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+  title: string;
+  description: string;
+  className?: string;
+};
 
-const Modal = (props: Props) => {
+export const Modal = ({
+  trigger,
+  children,
+  title,
+  description,
+  className,
+}: Props) => {
   return (
-    <div>Modal</div>
-  )
-}
+    <Dialog>
+      <DialogTrigger  className={className}>
+        {trigger}
+      </DialogTrigger>
 
-export default Modal
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+};
+

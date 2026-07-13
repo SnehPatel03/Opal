@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
+import { tr } from "date-fns/locale";
 import { Prosto_One } from "next/font/google";
 
 export const onAuthenticatedUser = async () => {
@@ -99,5 +100,43 @@ export const getNotifications = async () => {
   } catch (error) {
     console.log("error in getting notification ::", error);
     return { status: 403 };
+  }
+};
+
+export const searchUsers = async (query: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 404 };
+    }
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { firstname: { contains: query } },
+          { email: { contains: query } },
+          { lastname: { contains: query } },
+        ],
+        NOT: [{ clerkid: user.id }],
+      },
+      select: {
+        id: true,
+        subscription: {
+          select: {
+            plan: true,
+          },
+        },
+        firstname: true,
+        lastname: true,
+        email: true,
+        image: true,
+      },
+    });
+
+    if (users && users.length > 0) {
+      return { status: 200, data: users };
+    }
+    return { status: 400, data: undefined };
+  } catch (error) {
+    return { status: 500, data: undefined };
   }
 };

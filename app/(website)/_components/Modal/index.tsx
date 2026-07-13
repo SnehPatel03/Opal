@@ -28,7 +28,6 @@ export const Modal = ({
       <DialogTrigger  className={className}>
         {trigger}
       </DialogTrigger>
-
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

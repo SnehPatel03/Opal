@@ -4,6 +4,9 @@ import {
   Bell,
   CreditCard,
   Settings,
+  Clapperboard,
+  Folder,
+  FolderArchive,
 } from "lucide-react";
 
 export const MENU_ITEMS = (
@@ -21,7 +24,7 @@ export const MENU_ITEMS = (
   {
     title: "Library",
     href: `/dashboard/${workspaceId}/library`,
-    icon: <LibraryBig className="h-5 w-5 text-neutral-400" />,
+    icon: <FolderArchive className="h-5 w-5 text-neutral-400" />,
   },
   {
     title: "Notifications",

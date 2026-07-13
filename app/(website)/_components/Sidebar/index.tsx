@@ -23,10 +23,7 @@ import { MENU_ITEMS } from "@/constants";
 
 import { userQueryData } from "@/hooks/userQueryData";
 
-import {
-  NotifactionProps,
-  WorkspaceProps,
-} from "@/types/index.type";
+import { NotifactionProps, WorkspaceProps } from "@/types/index.type";
 
 import { Modal } from "../Modal";
 import SearchWorkspaceMember from "../SearchWorkspaceMember";
@@ -42,12 +39,12 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
   const { data: workspaces, isFetched } = userQueryData(
     ["user-workspaces"],
-    getWorkspaces
+    getWorkspaces,
   );
 
   const { data: notifications } = userQueryData(
     ["user-notifications"],
-    getNotifications
+    getNotifications,
   );
 
   const workspace = (workspaces as WorkspaceProps | undefined)?.data;
@@ -60,20 +57,20 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     if (!workspace) return "";
 
     const own = workspace.workspace.find(
-      (workspace) => workspace.id === selectedWorkspaceId
+      (workspace) => workspace.id === selectedWorkspaceId,
     );
 
     if (own) return own.name;
 
     const member = workspace.members.find(
-      (member) => member.Workspace.id === selectedWorkspaceId
+      (member) => member.Workspace.id === selectedWorkspaceId,
     );
 
     return member?.Workspace.name ?? "";
   }, [workspace, selectedWorkspaceId]);
 
   const currentWorkspace = workspace?.workspace.find(
-    (workspace) => workspace.id === activeWorkspaceId
+    (workspace) => workspace.id === activeWorkspaceId,
   );
 
   const onChangeActiveWorkspace = (value: string | null) => {
@@ -86,7 +83,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const menuItems = MENU_ITEMS(activeWorkspaceId);
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-zinc-800 bg-[#111111] text-white">
+    <aside className="flex h-screen w-64 flex-col overflow-hidden border-r border-zinc-800 bg-[#111111] text-white">
       {/* Logo */}
       <div className="flex items-center justify-center gap-2 border-b border-zinc-800 py-8">
         <Image
@@ -100,9 +97,8 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         <h1 className="text-3xl font-semibold">Opal</h1>
       </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col p-4">
-        {/* Workspace Switcher */}
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
         <Select
           value={selectedWorkspaceId}
           onValueChange={onChangeActiveWorkspace}
@@ -183,13 +179,68 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 selected={pathname === item.href}
                 notification={
                   item.title === "Notifications"
-                    ? count?._count?.notification ?? 0
+                    ? (count?._count?.notification ?? 0)
                     : undefined
                 }
               />
             ))}
           </ul>
         </nav>
+
+        <div className="h-px via-zinc-800 to-transparent" />
+
+        <div className="flex items-center justify-between border-b border-zinc-800/60 px-4 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+              Workspaces
+            </p>
+
+            <p className="mt-1 text-xs text-zinc-600">
+              {workspace?.workspace.length ?? 0} Workspace
+              {(workspace?.workspace.length ?? 0) !== 1 && "s"}
+            </p>
+          </div>
+
+          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-[11px] font-semibold text-zinc-400">
+            {workspace?.workspace.length ?? 0}
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl mt-2">
+          <div className="pointer-events-none absolute top-0 left-0 z-20 h-12 w-full bg-gradient-to-b from-[#151515] via-[#151515]/90 to-transparent" />
+
+          <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-12 w-full bg-gradient-to-t from-[#151515] via-[#151515]/90 to-transparent" />
+
+          <div className="no-scrollbar max-h-72 space-y-1 overflow-y-auto p-3 scroll-smooth">
+            {workspace?.workspace.map((item) => (
+              <SidebarItem
+                key={item.id}
+                title={item.name}
+                href={`/dashboard/${item.id}`}
+                selected={pathname === `/dashboard/${item.id}`}
+                icon={
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700/80 bg-zinc-800 text-[11px] font-semibold text-zinc-200 shadow-inner shadow-black/40">
+                    {item.name.charAt(0).toUpperCase()}
+                  </div>
+                }
+              />
+            ))}
+
+            {workspace && workspace.workspace.length === 0 && (
+              <div className="rounded-xl border border-dashed border-zinc-800 py-10 text-center">
+                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-zinc-500">
+                  W
+                </div>
+
+                <p className="text-sm text-zinc-400">No Workspaces</p>
+
+                <p className="mt-1 text-xs text-zinc-600">
+                  Create your first workspace to get started.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </aside>
   );

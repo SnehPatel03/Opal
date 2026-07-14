@@ -25,8 +25,8 @@ const SidebarItem = ({
       className={cn(
         "group relative flex items-center justify-between rounded-lg px-2.5 py-2 transition-all duration-200",
         selected
-          ? "bg-gradient-to-b from-neutral-800 to-neutral-800/80 text-white shadow-sm shadow-black/40"
-          : "text-neutral-400 hover:bg-gradient-to-b hover:from-neutral-900 hover:to-neutral-900/60 hover:text-white"
+          ? "bg-linear-to-b from-neutral-800 to-neutral-800/80 text-white shadow-sm shadow-black/40"
+          : "text-neutral-400 hover:bg-linear-to-b hover:from-neutral-900 hover:to-neutral-900/60 hover:text-white"
       )}
     >
       <div className="flex min-w-0 items-center gap-2.5">

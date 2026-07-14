@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { PlusCircle } from "lucide-react";
+import { Menu, PlusCircle, X } from "lucide-react";
 
 import {
   Select,
@@ -28,6 +28,9 @@ import { NotifactionProps, WorkspaceProps } from "@/types/index.type";
 import { Modal } from "../Modal";
 import SearchWorkspaceMember from "../SearchWorkspaceMember";
 import SidebarItem from "./SidebarItems";
+import GlobalCard from "../GlobalCard";
+import SearchBar from "../SearchBar";
+
 
 type Props = {
   activeWorkspaceId: string;
@@ -52,6 +55,8 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
   const [selectedWorkspaceId, setSelectedWorkspaceId] =
     useState(activeWorkspaceId);
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const selectedWorkspaceName = useMemo(() => {
     if (!workspace) return "";
@@ -81,29 +86,29 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   };
 
   const menuItems = MENU_ITEMS(activeWorkspaceId);
+  const ownedWorkspaces =
+    workspace?.workspace.filter((item) => item.type !== "PERSONAL") ?? [];
 
-  return (
+  const sidebarContent = (
     <aside className="flex h-screen w-64 flex-col overflow-hidden border-r border-zinc-800 bg-[#111111] text-white">
-      {/* Logo */}
-      <div className="flex items-center justify-center gap-2 border-b border-zinc-800 py-8">
+      <div className="flex items-center justify-center gap-2 border-b border-zinc-800 py-3 px-4">
         <Image
           src="/logo.svg"
           alt="Opal Logo"
-          width={40}
-          height={40}
+          width={32}
+          height={32}
           priority
         />
 
-        <h1 className="text-3xl font-semibold">Opal</h1>
+        <h1 className="text-2xl font-semibold">Opal</h1>
       </div>
 
-
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
         <Select
           value={selectedWorkspaceId}
           onValueChange={onChangeActiveWorkspace}
         >
-          <SelectTrigger className="w-full border-zinc-700 bg-zinc-900">
+          <SelectTrigger className="w-full border-zinc-700 bg-zinc-900 text-sm">
             <SelectValue placeholder="Select Workspace">
               {selectedWorkspaceName || "Select Workspace"}
             </SelectValue>
@@ -124,7 +129,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             {workspace && workspace.members.length > 0 && (
               <>
                 <SelectSeparator />
-
                 <SelectGroup>
                   <SelectLabel>
                     Member Workspaces ({workspace.members.length})
@@ -151,9 +155,9 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
               title="Invite To Workspace"
               description="Invite other users to your workspace"
               trigger={
-                <span className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-neutral-800/90 bg-neutral-900 px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-neutral-800">
-                  <PlusCircle size={16} className="text-neutral-400" />
-                  <span>Invite To Workspace</span>
+                <span className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-neutral-800/90 bg-neutral-900 px-3 py-2 text-xs text-neutral-300 transition-colors hover:bg-neutral-800">
+                  <PlusCircle size={14} className="text-neutral-400" />
+                  <span>Invite</span>
                 </span>
               }
             >
@@ -162,16 +166,15 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
               </div>
             </Modal>
           )}
-
-        {/* Menu */}
-        <div className="mt-6 mb-3 px-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+        <SelectSeparator className="mt-2" />
+        <div className=" mt-2 mb-2 px-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Menu
           </p>
         </div>
 
-        <nav className="mt-2">
-          <ul className="space-y-1">
+        <nav className="mt-1">
+          <ul className="space-y-0.5">
             {menuItems.map((item) => (
               <SidebarItem
                 key={item.title}
@@ -187,62 +190,118 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
           </ul>
         </nav>
 
-        <div className="h-px via-zinc-800 to-transparent" />
-
-        <div className="flex items-center justify-between border-b border-zinc-800/60 px-4 py-4">
+        <div className="flex items-center justify-between border-b border-zinc-800/60 px-3 py-2 mt-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
               Workspaces
             </p>
-
-            <p className="mt-1 text-xs text-zinc-600">
-              {workspace?.workspace.length ?? 0} Workspace
-              {(workspace?.workspace.length ?? 0) !== 1 && "s"}
-            </p>
-          </div>
-
-          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-[11px] font-semibold text-zinc-400">
-            {workspace?.workspace.length ?? 0}
           </div>
         </div>
+        {ownedWorkspaces.length > 0 ? (
+          <div className="relative mt-2 overflow-hidden rounded-lg border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl">
+            <div className="pointer-events-none absolute top-0 left-0 z-20 h-8 w-full bg-linear-to-b from-[#151515] via-[#151515]/90 to-transparent" />
 
-        <div className="relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl mt-2">
-          <div className="pointer-events-none absolute top-0 left-0 z-20 h-12 w-full bg-gradient-to-b from-[#151515] via-[#151515]/90 to-transparent" />
+            <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-8 w-full bg-linear-to-t from-[#151515] via-[#151515]/90 to-transparent" />
 
-          <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-12 w-full bg-gradient-to-t from-[#151515] via-[#151515]/90 to-transparent" />
-
-          <div className="no-scrollbar max-h-72 space-y-1 overflow-y-auto p-3 scroll-smooth">
-            {workspace?.workspace.map((item) => (
-              <SidebarItem
-                key={item.id}
-                title={item.name}
-                href={`/dashboard/${item.id}`}
-                selected={pathname === `/dashboard/${item.id}`}
-                icon={
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700/80 bg-zinc-800 text-[11px] font-semibold text-zinc-200 shadow-inner shadow-black/40">
-                    {item.name.charAt(0).toUpperCase()}
-                  </div>
-                }
-              />
-            ))}
-
-            {workspace && workspace.workspace.length === 0 && (
-              <div className="rounded-xl border border-dashed border-zinc-800 py-10 text-center">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-zinc-500">
-                  W
-                </div>
-
-                <p className="text-sm text-zinc-400">No Workspaces</p>
-
-                <p className="mt-1 text-xs text-zinc-600">
-                  Create your first workspace to get started.
+            <div className="no-scrollbar max-h-40 space-y-0.5 overflow-y-auto p-2 py-2 scroll-smooth">
+              {ownedWorkspaces.map((item) => (
+                <SidebarItem
+                  key={item.id}
+                  title={item.name}
+                  href={`/dashboard/${item.id}`}
+                  selected={pathname === `/dashboard/${item.id}`}
+                  icon={
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-100 text-[11px] font-semibold text-zinc-900">
+                      {item.name.charAt(0).toUpperCase()}
+                    </div>
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-2 rounded-lg border border-dashed border-zinc-800 py-6 text-center">
+            <p className="text-xs text-zinc-400">No Workspaces</p>
+          </div>
+        )}
+        <div className="mt-2 space-y-0.5">
+          {workspace?.workspace.length === 1 &&
+            workspace.members.length === 0 && (
+              <div className="w-full">
+                <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
+                  {workspace.subscription?.plan === "FREE"
+                    ? "Upgrade to Create Workspaces."
+                    : "No Workspaces"}
                 </p>
               </div>
             )}
-          </div>
+          {workspace?.members?.map((member) => (
+            <SidebarItem
+              key={member.Workspace.name}
+              title={member.Workspace.name}
+              href={`/dashboard/${member.Workspace.id}`}
+              selected={pathname === `/dashboard/${member.Workspace.id}`}
+              icon={
+                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-800 text-[10px] font-semibold text-zinc-200">
+                  {member.Workspace.name.charAt(0).toUpperCase()}
+                </div>
+              }
+            />
+          ))}
         </div>
+        {workspace?.subscription?.plan === "FREE" && (
+          <GlobalCard
+            className="mt-auto"
+            title="Upgrade to Pro"
+            description="Unlock AI Features like transcription, AI Summary  and effortless collaboration."
+            footer={
+              <button className="w-full rounded-lg bg-white py-2 text-sm font-medium text-black transition hover:bg-zinc-200">
+                Upgrade Now
+              </button>
+            }
+          />
+        )}
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      <div className="hidden lg:flex">{sidebarContent}</div>
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center border-b border-zinc-800 bg-[#111111] px-4 lg:hidden">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="rounded-lg p-2 text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+        >
+          <Menu size={22} />
+
+        </button>
+      </div>
+
+      <div
+        onClick={() => setSidebarOpen(false)}
+        className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-all duration-300 lg:hidden ${
+          sidebarOpen ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+      />
+
+      <div
+        className={`fixed top-0 left-0 z-50 h-screen transition-transform duration-300 ease-in-out lg:hidden ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="relative h-full">
+          {sidebarContent}
+
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="absolute top-2.5 right-4 rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 

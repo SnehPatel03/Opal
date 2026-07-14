@@ -13,9 +13,8 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import Sidebar from "@/app/(website)/_components/Sidebar";
-
-
-
+import SearchBar from "@/app/(website)/_components/SearchBar";
+import TopNavbar from "@/app/(website)/_components/TopNavbar";
 type Props = {
   params: Promise<{
     workspaceId: string;
@@ -58,15 +57,16 @@ const Layout = async ({ params, children }: Props) => {
   });
 
   return (
-   <HydrationBoundary state={dehydrate(query)}>
-    <div className="flex  w-screen h-screen">
-      <Sidebar activeWorkspaceId={workspaceId} />
+    <HydrationBoundary state={dehydrate(query)}>
+      <div className="flex h-screen w-screen overflow-hidden">
+        <Sidebar activeWorkspaceId={workspaceId} />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <TopNavbar />
 
-      <main className="flex-1">
-        {children}
-      </main>
-    </div>
-  </HydrationBoundary>
+          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        </div>
+      </div>
+    </HydrationBoundary>
   );
 };
 export default Layout;

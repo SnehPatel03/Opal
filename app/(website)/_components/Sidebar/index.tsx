@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, PlusCircle, X } from "lucide-react";
@@ -44,6 +44,15 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     ["user-workspaces"],
     getWorkspaces,
   );
+
+  useEffect(() => {
+  const openSidebar = () => setSidebarOpen(true);
+
+  window.addEventListener("open-sidebar", openSidebar);
+
+  return () =>
+    window.removeEventListener("open-sidebar", openSidebar);
+}, []);
 
   const { data: notifications } = userQueryData(
     ["user-notifications"],
@@ -148,7 +157,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
           </SelectContent>
         </Select>
 
-        {/* Invite Button */}
         {currentWorkspace?.type === "PUBLIC" &&
           workspace?.subscription?.plan === "PRO" && (
             <Modal
@@ -251,7 +259,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         </div>
         {workspace?.subscription?.plan === "FREE" && (
           <GlobalCard
-            className="mt-auto"
+            className="mt-auto "
             title="Upgrade to Pro"
             description="Unlock AI Features like transcription, AI Summary  and effortless collaboration."
             footer={
@@ -268,15 +276,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   return (
     <>
       <div className="hidden lg:flex">{sidebarContent}</div>
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center border-b border-zinc-800 bg-[#111111] px-4 lg:hidden">
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="rounded-lg p-2 text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
-        >
-          <Menu size={22} />
-
-        </button>
-      </div>
+    
 
       <div
         onClick={() => setSidebarOpen(false)}

@@ -2,6 +2,7 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { use } from "react";
 
 export const verifyAccessToWorkspace = async (workspaceId: string) => {
   try {
@@ -95,10 +96,7 @@ export const getAllUserVideos = async (workspaceId: string) => {
 
     const videos = await prisma.video.findMany({
       where: {
-        OR: [
-          { workspaceId },
-          { folderId: workspaceId },
-        ],
+        OR: [{ workspaceId }, { folderId: workspaceId }],
       },
       select: {
         id: true,
@@ -195,6 +193,64 @@ export const getWorkspaces = async () => {
 
     return {
       status: 500,
+    };
+  }
+};
+export const CreateWorkspaces = async (name: string) => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      return {
+        status: 401,
+        data: "Please sign in to continue.",
+      };
+    }
+
+    const authorize = await prisma.user.findUnique({
+      where: {
+        clerkid: user.id,
+      },
+      select: {
+        subscription: {
+          select: {
+            plan: true,
+          },
+        },
+      },
+    });
+
+    if (authorize?.subscription?.plan !== "PRO") {
+      return {
+        status: 403,
+        data: "Upgrade to Pro to create additional workspaces.",
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        clerkid: user.id,
+      },
+      data: {
+        workspace: {
+          create: {
+            name,
+            type: "PUBLIC",
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      data: "Workspace created successfully.",
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      status: 500,
+      data: "Something went wrong. Please try again.",
     };
   }
 };

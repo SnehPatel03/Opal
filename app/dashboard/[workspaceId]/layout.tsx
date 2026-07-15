@@ -15,6 +15,7 @@ import {
 import Sidebar from "@/app/(website)/_components/Sidebar";
 import SearchBar from "@/app/(website)/_components/SearchBar";
 import TopNavbar from "@/app/(website)/_components/TopNavbar";
+import GlobalHeader from "@/app/(website)/_components/GlobalHeader";
 type Props = {
   params: Promise<{
     workspaceId: string;
@@ -58,12 +59,18 @@ const Layout = async ({ params, children }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(query)}>
-      <div className="flex h-screen w-screen overflow-hidden">
+      <div className="flex h-screen overflow-hidden bg-[#0f0f0f]">
         <Sidebar activeWorkspaceId={workspaceId} />
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col">
           <TopNavbar />
 
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+              <GlobalHeader workspace={hasAccess.data.workspace}/>
+
+              <main className="mt-6">{children}</main>
+            </div>
+          </div>
         </div>
       </div>
     </HydrationBoundary>

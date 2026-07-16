@@ -1,9 +1,9 @@
 import { UseMutateFunction } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z, ZodTypeAny } from "zod";
+import { z } from "zod";
 
-const useZodForm = <TSchema extends ZodTypeAny>(
+const useZodForm = <TSchema extends any>(
   schema: any,
   mutation: UseMutateFunction<any, Error, z.infer<TSchema>, unknown>,
   defaultValues?: Partial<z.infer<any>>

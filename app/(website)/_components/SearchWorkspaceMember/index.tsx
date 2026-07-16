@@ -38,7 +38,7 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
           onChange={onSearchQuery}
           type="text"
           placeholder="Search users by name or email..."
-          className="h-11 w-full rounded-lg border border-neutral-800 bg-neutral-900 pl-10 pr-4 text-sm text-white outline-none transition-all placeholder:text-neutral-500 focus:border-neutral-600"
+          className="h-11 w-full rounded-lg border border-neutral-800 bg-neutral-900 pl-10 pr-4 text-sm text-neutral-200 outline-none transition-all placeholder:text-neutral-500 focus:border-neutral-600"
         />
       </div>
 
@@ -67,7 +67,7 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
                 />
 
                 <div className="flex flex-col">
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-neutral-200">
                     {user.firstname} {user.lastname}
                   </span>
 
@@ -90,7 +90,7 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
               </div>
 
               <button
-                className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-medium text-black transition hover:bg-neutral-200"
+                className="flex items-center gap-2 rounded-lg bg-neutral-200 px-3 py-2 text-xs font-medium text-black transition hover:bg-neutral-200"
               >
                 <UserPlus size={15} />
                 Invite

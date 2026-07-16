@@ -26,7 +26,7 @@ const GlobalCard = ({
       )}
     >
       <div className="space-y-1 p-4">
-        <h3 className="text-sm font-semibold text-white">{title}</h3>
+        <h3 className="text-sm font-semibold text-neutral-200">{title}</h3>
 
         {description && (
           <p className="text-xs leading-relaxed text-zinc-400">

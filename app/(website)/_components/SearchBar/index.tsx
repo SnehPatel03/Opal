@@ -20,7 +20,7 @@ const SearchBar = ({ value, placeholder = "Search...", onChange }: Props) => {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-zinc-500 focus:outline-none"
+        className="min-w-0 flex-1 bg-transparent text-sm text-neutral-200 placeholder:text-zinc-500 focus:outline-none"
       />
     </div>
   );

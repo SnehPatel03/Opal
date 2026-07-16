@@ -1,8 +1,7 @@
 "use server";
 
-import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { use } from "react";
+import { currentUser } from "@clerk/nextjs/server";
 
 export const verifyAccessToWorkspace = async (workspaceId: string) => {
   try {
@@ -251,6 +250,54 @@ export const CreateWorkspaces = async (name: string) => {
     return {
       status: 500,
       data: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export const renameFolder = async (folderId: string, name: string) => {
+  try {
+    const folder = await prisma.folder.update({
+      where: {
+        id: folderId,
+      },
+      data: {
+        name,
+      },
+    });
+    if (folder) {
+      return { status: 200, data: "Renamed" };
+    }
+    return { status: 400, data: "Not Renamed" };
+  } catch (error) {
+    console.log("Error in renameing action", error);
+    return { status: 400, data: "oops Something went wrong!" };
+  }
+};
+export const createFolder = async (workspaceId: string) => {
+  try {
+    await prisma.workspace.update({
+      where: {
+        id: workspaceId,
+      },
+      data: {
+        folder: {
+          create: {
+            name: "Untitled",
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      data: "New folder created successfully",
+    };
+  } catch (error) {
+    console.error("Error creating folder:", error);
+
+    return {
+      status: 500,
+      data: "Oops! Something went wrong while creating the folder.",
     };
   }
 };

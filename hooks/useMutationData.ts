@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import {
-  MutateFunction,
   MutationFunction,
   MutationKey,
-  QueryKey,
   useMutation,
+  useMutationState,
   useQueryClient,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,7 +11,7 @@ import { toast } from "sonner";
 export const useMutationData = (
   mutationKey: MutationKey,
   mutationFn: MutationFunction<any, any>,
-  querykey?: string,
+  querykey: string,
   onSuccess?: () => void,
 ) => {
   const client = useQueryClient();
@@ -21,19 +20,34 @@ export const useMutationData = (
     mutationFn,
     onSuccess(data) {
       if (onSuccess) onSuccess();
-     if (data?.status === 200) {
-  return toast.success("Success", {
-    description: data?.data,
-  });
-}
+      if (data?.status === 200) {
+        return toast.success("Success", {
+          description: data?.data,
+        });
+      }
 
-return toast.error("Error", {
-  description: data?.data,
-});
+      return toast.error("Error", {
+        description: data?.data,
+      });
     },
     onSettled: async () => {
       return await client.invalidateQueries({ queryKey: [querykey] });
     },
   });
   return { mutate, isPending };
+};
+
+export const useMutationDataState = (mutationKey: MutationKey) => {
+  const data = useMutationState({
+    filters: { mutationKey },
+    select: (mutation) => {
+      return {
+        variables: mutation.state.variables,
+        status: mutation.state.status,
+      };
+    },
+  });
+
+  const latestVariable = data[data.length - 1];
+  return { latestVariable };
 };

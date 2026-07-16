@@ -99,7 +99,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     workspace?.workspace.filter((item) => item.type !== "PERSONAL") ?? [];
 
   const sidebarContent = (
-    <aside className="flex h-screen w-64 flex-col overflow-hidden border-r border-zinc-800 bg-[#111111] text-white">
+    <aside className="flex h-screen w-64 flex-col overflow-hidden border-r border-zinc-800 bg-[#111111] text-neutral-200">
       <div className="flex items-center justify-center gap-2 border-b border-zinc-800 py-3 px-4">
         <Image
           src="/logo.svg"
@@ -123,7 +123,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             </SelectValue>
           </SelectTrigger>
 
-          <SelectContent className="border-zinc-800 bg-[#111111] text-white">
+          <SelectContent className="border-zinc-800 bg-[#111111] text-neutral-200">
             <SelectGroup>
               <SelectLabel>Workspaces</SelectLabel>
 
@@ -263,7 +263,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             title="Upgrade to Pro"
             description="Unlock AI Features like transcription, AI Summary  and effortless collaboration."
             footer={
-              <button className="w-full rounded-lg bg-white py-2 text-sm font-medium text-black transition hover:bg-zinc-200">
+              <button className="w-full rounded-lg bg-neutral-200 py-2 text-sm font-medium text-black transition hover:bg-zinc-200">
                 Upgrade Now
               </button>
             }
@@ -295,7 +295,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="absolute top-2.5 right-4 rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+            className="absolute top-2.5 right-4 rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-neutral-200"
           >
             <X size={20} />
           </button>

@@ -301,3 +301,29 @@ export const createFolder = async (workspaceId: string) => {
     };
   }
 };
+
+export const getFolderInfo = async (folderId: string) => {
+  try {
+    const folderInfo = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+      },
+      select: {
+        name: true,
+        _count: {
+          select: {
+            videos: true,
+          },
+        },
+      },
+    });
+
+    if (folderInfo) {
+      return { status: 200, data: folderInfo };
+    }
+    return { status: 200, data: null };
+  } catch (error) {
+    console.log("Error in folder info getting action ", error);
+    return { status: 500, data: "oops! error in getting Folder info" };
+  }
+};

@@ -44,7 +44,6 @@ const Folder = ({ id, name, count = 0, optimistic }: Props) => {
   };
 
   const handleFolderClick = () => {
-    // Don't navigate while editing
     if (onRename) return;
 
     router.push(`${pathname}/folder/${id}`);

@@ -19,7 +19,7 @@ export type FolderProps = {
     createdAt: Date;
     workspaceId: string | null;
     _count: {
-      video: number;
+      videos: number;
     };
   }[];
 };
@@ -49,7 +49,6 @@ const Folders = ({ workspaceId }: Props) => {
   }
 
   const { status, data: foldersData } = data as FolderProps;
-
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
@@ -89,7 +88,7 @@ const Folders = ({ workspaceId }: Props) => {
               key={folder.id}
               id={folder.id}
               name={folder.name}
-              count={folder._count.video}
+              count={folder._count.videos}
             />
           ))
         )}

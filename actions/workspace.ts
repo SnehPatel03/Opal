@@ -327,3 +327,25 @@ export const getFolderInfo = async (folderId: string) => {
     return { status: 500, data: "oops! error in getting Folder info" };
   }
 };
+
+export const moveVideoLocation = async (
+  videoId: string,
+  workspaceId: string,
+  folderId: string,
+) => {
+  try {
+    const location = await prisma.video.update({
+      where: {
+        id: videoId,
+      },
+      data: {
+        folderId: folderId || null,
+        workspaceId,
+      },
+    });
+    if (location) return { status: 200, data: "folder changed successfully" };
+    return { status: 404, data: "folder/workspace not found" };
+  } catch (error) {
+    return { status: 500, data: " oops! soemthing went wrong" };
+  }
+};

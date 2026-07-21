@@ -15,10 +15,10 @@ type Props = {
   optimistic?: boolean;
 };
 
-const Folder = ({ id, name, count = 0, optimistic }: Props) => {
+const Folder = ({ id, name, count, optimistic }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
-
+console.log("count",count)
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [onRename, setOnRename] = useState(false);
@@ -97,7 +97,7 @@ const Folder = ({ id, name, count = 0, optimistic }: Props) => {
         )}
 
         <p className="text-sm text-zinc-500">
-          {count} {count === 1 ? "video" : "videos"}
+          {count} {count === 1 || count === 0 ? "video" : "videos"}
         </p>
       </div>
     </div>

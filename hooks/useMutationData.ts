@@ -11,7 +11,7 @@ import { toast } from "sonner";
 export const useMutationData = (
   mutationKey: MutationKey,
   mutationFn: MutationFunction<any, any>,
-  querykey: string,
+  querykey?: string,
   onSuccess?: () => void,
 ) => {
   const client = useQueryClient();

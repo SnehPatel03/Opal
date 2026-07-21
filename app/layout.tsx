@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "./components/theme-provider";
 import ReactQueryProvider from "./react-query";
 import { Toaster } from "sonner";
+import { ReduxProvider } from "@/redux/Provider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -35,7 +36,7 @@ export default function RootLayout({
             enableSystem={false}
           >
             <ReactQueryProvider>
-              {children}
+              <ReduxProvider>{children}</ReduxProvider>
               <Toaster richColors position="top-right" />
             </ReactQueryProvider>
           </ThemeProvider>

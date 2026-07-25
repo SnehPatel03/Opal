@@ -6,6 +6,8 @@ import { userQueryData } from "@/hooks/userQueryData";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Folder as FolderIcon } from "lucide-react";
 import Folder from "./folder";
+import { useDispatch } from "react-redux";
+import { FOLDERS } from "@/redux/slices/folders";
 
 type Props = {
   workspaceId: string;
@@ -25,10 +27,12 @@ export type FolderProps = {
 };
 
 const Folders = ({ workspaceId }: Props) => {
-  const { data, isFetched , isPending } = userQueryData(
+  const { data, isFetched, isPending } = userQueryData(
     ["workspace-folders", workspaceId],
-    () => getWorkspaceFolders(workspaceId)
+    () => getWorkspaceFolders(workspaceId),
   );
+
+  const dispatch = useDispatch();
 
   const { latestVariable }: any = useMutationDataState(["create-folders"]);
 
@@ -49,14 +53,15 @@ const Folders = ({ workspaceId }: Props) => {
   }
 
   const { status, data: foldersData } = data as FolderProps;
+  if (isFetched && foldersData) {
+    dispatch(FOLDERS(foldersData));
+  }
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <FolderIcon className="h-5 w-5 text-zinc-400" />
-          <h2 className="text-xl font-semibold text-neutral-200">
-            Folders
-          </h2>
+          <h2 className="text-xl font-semibold text-neutral-200">Folders</h2>
         </div>
 
         <button className="flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white">
@@ -68,7 +73,7 @@ const Folders = ({ workspaceId }: Props) => {
       <section
         className={cn(
           "flex gap-4 overflow-x-auto pb-2",
-          status !== 200 && "justify-center"
+          status !== 200 && "justify-center",
         )}
       >
         {latestVariable?.status === "pending" && (

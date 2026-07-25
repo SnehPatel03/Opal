@@ -15,21 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { getNotifications } from "@/actions/user";
 import { getWorkspaces } from "@/actions/workspace";
-
 import { MENU_ITEMS } from "@/constants";
-
 import { userQueryData } from "@/hooks/userQueryData";
-
 import { NotifactionProps, WorkspaceProps } from "@/types/index.type";
-
 import { Modal } from "../Modal";
 import SearchWorkspaceMember from "../SearchWorkspaceMember";
 import SidebarItem from "./SidebarItems";
 import GlobalCard from "../GlobalCard";
 import SearchBar from "../SearchBar";
+import { useDispatch } from "react-redux";
+import { WORKSPACES } from "@/redux/slices/workspaces";
 
 
 type Props = {
@@ -39,11 +36,12 @@ type Props = {
 const Sidebar = ({ activeWorkspaceId }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
-
-  const { data: workspaces, isFetched } = userQueryData(
+const dispatch = useDispatch()
+  const { data, isFetched } = userQueryData(
     ["user-workspaces"],
     getWorkspaces,
   );
+  const {data:workspace} = data as WorkspaceProps
 
   useEffect(() => {
   const openSidebar = () => setSidebarOpen(true);
@@ -59,7 +57,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     getNotifications,
   );
 
-  const workspace = (workspaces as WorkspaceProps | undefined)?.data;
+  // const workspace = (workspaces as WorkspaceProps | undefined)?.data;
   const count = (notifications as NotifactionProps | undefined)?.data;
 
   const [selectedWorkspaceId, setSelectedWorkspaceId] =
@@ -87,6 +85,10 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     (workspace) => workspace.id === activeWorkspaceId,
   );
 
+
+  if(isFetched && workspace){
+    dispatch(WORKSPACES(workspace.workspace))
+  }
   const onChangeActiveWorkspace = (value: string | null) => {
     if (!value) return;
 
@@ -239,7 +241,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
                   {workspace.subscription?.plan === "FREE"
                     ? "Upgrade to Create Workspaces."
-                    : "No Workspaces"}
+                    : ""}
                 </p>
               </div>
             )}

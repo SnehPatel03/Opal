@@ -1,30 +1,33 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type initialStateProps = {
-  folders: ({
-    _count: {
-      videos: number;
-    };
-  } & {
-    id: string;
-    name: string;
-    createdAt: Date;
-    workspaceId: string | null;
-  })[];
+export type Folder = {
+  id: string;
+  name: string;
+  createdAt: Date;
+  workspaceId: string | null;
+  _count: {
+    videos: number;
+  };
 };
 
-const initialState: initialStateProps = {
+type FolderState = {
+  folders: Folder[];
+};
+
+const initialState: FolderState = {
   folders: [],
 };
-export const Folders = createSlice({
+
+const folders = createSlice({
   name: "folders",
   initialState,
   reducers: {
-    FOLDERS: (state, action: PayloadAction<initialStateProps>) => {
-      return { ...action.payload };
+    FOLDERS: (state, action: PayloadAction<Folder[]>) => {
+      state.folders = action.payload;
     },
   },
 });
 
-export const { FOLDERS } = Folders.actions;
-export default Folders.reducer;
+export const { FOLDERS } = folders.actions;
+
+export default folders.reducer;

@@ -47,5 +47,30 @@ export type VideosProps = {
     createdAt: Date;
     title: string | null;
     source: string;
-  }[]
+  }[];
+};
+
+export type VideoProps = {
+  status: number;
+  data: {
+    User: {
+      firstname: string;
+      lastname: string;
+      clerkid: string;
+      image: string | null;
+      trial: boolean;
+      subscription: {
+        plan: "PRO" | "FREE";
+      } | null;
+    } | null;
+    title: string | null;
+    description: string | null;
+    source: string;
+    views: string;
+    createdAt: Date;
+    processing: boolean;
+    summery: string;
+  };
+  author: boolean;
+  relativeDate: string;
 };

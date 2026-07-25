@@ -1,21 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type initialStateProps = {
-  workspaces: { type: "PERSONAL" | "PUBLIC"; name: string; id: string }[];
+export type Workspace = {
+  id: string;
+  name: string;
+  type: "PERSONAL" | "PUBLIC";
 };
 
-const initialState: initialStateProps = {
+type WorkspaceState = {
+  workspaces: Workspace[];
+};
+
+const initialState: WorkspaceState = {
   workspaces: [],
 };
-export const workspaces = createSlice({
+
+const workspaces = createSlice({
   name: "workspaces",
   initialState,
   reducers: {
-    WORKSPACES: (state, action: PayloadAction<initialStateProps>) => {
-      return { ...action.payload };
+    WORKSPACES: (state, action: PayloadAction<Workspace[]>) => {
+      state.workspaces = action.payload;
     },
   },
 });
 
 export const { WORKSPACES } = workspaces.actions;
+
 export default workspaces.reducer;

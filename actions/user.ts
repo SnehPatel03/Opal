@@ -186,3 +186,105 @@ export const enableFirstView = async (state: boolean) => {
     return { status: 500 };
   }
 };
+export const createCommentAndReply = async (
+  videoId: string,
+  comment: string,
+  userId: string,
+  commentId?: string,
+) => {
+  try {
+    console.log({
+      videoId,
+      comment,
+      userId,
+      commentId,
+    });
+
+    await prisma.comment.create({
+      data: {
+        comment,
+        videoId,
+        userId,
+        commentId: commentId ?? null,
+      },
+    });
+
+    return {
+      status: 200,
+      data: commentId ? "Reply Added!" : "Comment Added!",
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      status: 500,
+      data: error instanceof Error ? error.message : "Something went wrong",
+    };
+  }
+};
+
+export const getUserProfile = async () => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 400 };
+    }
+    const profileInfo = await prisma.user.findUnique({
+      where: {
+        clerkid: user.id,
+      },
+      select: {
+        image: true,
+        id: true,
+      },
+    });
+    if (profileInfo) {
+      return { status: 200, data: profileInfo };
+    }
+    return { status: 404 };
+  } catch (error) {
+    return { status: 500 };
+  }
+};
+
+export const getVideoComment = async (id: string) => {
+  try {
+   const comments = await prisma.comment.findMany({
+  where: {
+    videoId: id,
+    commentId: null,
+  },
+
+  orderBy: {
+    createdAt: "desc",
+  },
+
+  include: {
+    User: true,
+
+    reply: {
+      orderBy: {
+        createdAt: "asc",
+      },
+
+      include: {
+        User: true,
+
+        reply: {
+          orderBy: {
+            createdAt: "asc",
+          },
+
+          include: {
+            User: true,
+          },
+        },
+      },
+    },
+  },
+});
+    return { status: 200, data: comments };
+  } catch (error) {
+    return { status: 400 };
+  }
+};

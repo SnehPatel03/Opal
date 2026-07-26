@@ -11,7 +11,7 @@ import { Download } from "lucide-react";
 import TabsComponent from "../../tabs";
 import AiTools from "../../AI-Tools ";
 import VideoTranscript from "../../VideoTranscript";
-import { TabsContent } from "@/components/ui/tabs";
+import ActivityPage from "../../Activity";
 
 type Props = {
   videoId: string;
@@ -105,11 +105,14 @@ const VideoPriview = ({ videoId }: Props) => {
             >
               <AiTools
                 videoId={videoId}
-                trial={video.User?.trial as boolean}
-                plan={video.User?.subscription?.plan!}
+                trial={video.User?.trial ?? false}
+                plan={video.User?.subscription?.plan ?? "FREE"}
               />
-              <VideoTranscript transcript={video.description!} />
-              <TabsContent value="Activity">Baad me dekh lenge</TabsContent>
+              <VideoTranscript transcript={video.description ?? ""} />
+              <ActivityPage
+                author={`${video.User?.firstname ?? ""} ${video.User?.lastname ?? ""}`.trim() || "this video"}
+                videoId={videoId}
+              />
             </TabsComponent>
           </div>
         </div>

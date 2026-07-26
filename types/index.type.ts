@@ -74,3 +74,47 @@ export type VideoProps = {
   author: boolean;
   relativeDate: string;
 };
+
+export type CommentRepliersProps = {
+  id: string;
+  comment: string;
+  createdAt: Date;
+  commentId: string | null;
+  userId: string | null;
+  videoId: string | null;
+  User: {
+    id: string;
+    email: string;
+    firstname: string;
+    lastname: string;
+    createdAt: Date;
+    clerkid: string;
+    image: string | null;
+    trial: boolean;
+    firstView: boolean;
+  } | null;
+  reply: CommentRepliersProps[];
+};
+
+export type VideoCommentsProps = {
+  data: {
+    User: {
+      id: string;
+      email: string;
+      firstname: string;
+      lastname: string;
+      createdAt: Date;
+      clerkid: string;
+      image: string | null;
+      trial: boolean;
+      firstView: boolean;
+    } | null;
+    reply: CommentRepliersProps[];
+    id: string;
+    comment: string;
+    createdAt: Date;
+    commentId: string | null;
+    userId: string | null;
+    videoId: string | null;  
+  }[];
+};

@@ -26,7 +26,7 @@ type Props = {
     label: string;
     value: string;
   }[];
-  label: string;
+  label?: string;
   placeholder: string;
   register: UseFormRegister<any>;
   name: string;

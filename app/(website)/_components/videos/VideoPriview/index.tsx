@@ -7,6 +7,11 @@ import React, { useEffect } from "react";
 import CopyLink from "../../CopyLink";
 import RichLink from "../../RichLink";
 import { truncateString } from "@/lib/utils";
+import { Download } from "lucide-react";
+import TabsComponent from "../../tabs";
+import AiTools from "../../AI-Tools ";
+import VideoTranscript from "../../VideoTranscript";
+import { TabsContent } from "@/components/ui/tabs";
 
 type Props = {
   videoId: string;
@@ -14,6 +19,7 @@ type Props = {
 
 const VideoPriview = ({ videoId }: Props) => {
   //WIP:set notify first view
+  //WIP: Activity tab contact setup
   const router = useRouter();
   const { data } = userQueryData(["preview-video", videoId], () =>
     getPreviewVideo(videoId),
@@ -38,9 +44,20 @@ const VideoPriview = ({ videoId }: Props) => {
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-10">
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
-        {/* ================= LEFT ================= */}
         <div className="xl:col-span-2 space-y-6">
-          {/* Video */}
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold text-white">{video.title}</h1>
+
+            <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
+              <span className="font-medium text-zinc-200">
+                {video.User?.firstname} {video.User?.lastname}
+              </span>
+              <span>•</span>
+              <span>{relativeDate}</span>
+              <span>•</span>
+              <span>{video.views} Views</span>
+            </div>
+          </div>
           <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-[#171717] shadow-lg">
             <video
               preload="metadata"
@@ -51,24 +68,6 @@ const VideoPriview = ({ videoId }: Props) => {
             </video>
           </div>
 
-          {/* Title */}
-          <div className="space-y-3">
-            <h1 className="text-3xl font-bold text-white">{video.title}</h1>
-
-            <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
-              <span className="font-medium text-zinc-200">
-                {video.User?.firstname} {video.User?.lastname}
-              </span>
-
-              <span>•</span>
-
-              <span>{relativeDate}</span>
-
-              <span>•</span>
-
-              <span>{video.views} Views</span>
-            </div>
-          </div>
 
           {/* Description */}
           <div className="rounded-2xl border border-zinc-800 bg-[#171717] p-6">
@@ -82,13 +81,11 @@ const VideoPriview = ({ videoId }: Props) => {
           </div>
         </div>
 
-        {/* ================= RIGHT ================= */}
         <div className="space-y-6">
-          {/* Share */}
           <div className="rounded-2xl border border-zinc-800 bg-[#171717] p-6">
             <h3 className="mb-5 text-lg font-semibold text-white">Share</h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <CopyLink videoId={videoId} />
 
               <RichLink
@@ -97,40 +94,23 @@ const VideoPriview = ({ videoId }: Props) => {
                 description={truncateString(video.description as string, 150)}
                 source={video.source}
               />
+              <Download className="text-neutral-500" />
             </div>
           </div>
 
-          {/* Video Info */}
           <div className="rounded-2xl border border-zinc-800 bg-[#171717] p-6">
-            <h3 className="mb-5 text-lg font-semibold text-white">
-              Video Information
-            </h3>
-
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Status</span>
-
-                <span
-                  className={`font-medium ${
-                    video.processing ? "text-yellow-400" : "text-green-400"
-                  }`}
-                >
-                  {video.processing ? "Processing" : "Ready"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Views</span>
-
-                <span className="text-white">{video.views}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Uploaded</span>
-
-                <span className="text-white">{relativeDate}</span>
-              </div>
-            </div>
+            <TabsComponent
+              defaultValue="AI Tools"
+              triggers={["AI Tools", "Transcript", "Activity"]}
+            >
+              <AiTools
+                videoId={videoId}
+                trial={video.User?.trial as boolean}
+                plan={video.User?.subscription?.plan!}
+              />
+              <VideoTranscript transcript={video.description!} />
+              <TabsContent value="Activity">Baad me dekh lenge</TabsContent>
+            </TabsComponent>
           </div>
         </div>
       </div>

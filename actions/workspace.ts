@@ -398,8 +398,61 @@ export const getPreviewVideo = async (videoId: string) => {
         relativeDate: daysAgo < 1 ? "Today" : `${daysAgo} days ago`,
       };
     }
-
   } catch (error) {
     return { status: 500, data: "oops! Something went wrong" };
+  }
+};
+type PaymentDetailsResponse = {
+  status: number;
+  data: {
+    subscription: {
+      plan: 'PRO' | 'FREE';
+    } | null;
+  } | null;
+  message?: string;
+};
+export const getpaymentDetails = async (): Promise<PaymentDetailsResponse> => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      return {
+        status: 404,
+        data: null,
+        message: "User not found",
+      };
+    }
+
+    const payment = await prisma.user.findUnique({
+      where: {
+        clerkid: user.id,
+      },
+      select: {
+        subscription: {
+          select: {
+            plan: true,
+          },
+        },
+      },
+    });
+
+    if (!payment) {
+      return {
+        status: 400,
+        data: null,
+        message: "Payment details not found",
+      };
+    }
+
+    return {
+      status: 200,
+      data: payment,
+    };
+  } catch {
+    return {
+      status: 500,
+      data: null,
+      message: "Oops! Something went wrong.",
+    };
   }
 };

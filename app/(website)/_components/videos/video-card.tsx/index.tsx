@@ -63,7 +63,7 @@ const VideoCard = ({
         <CopyLink videoId={id} />
       </div>
       <Link
-        href={`/preview/${id}`}
+        href={`/dashboard/${workspaceId}/video/${id}`}
         className="flex h-full flex-col transition duration-200 hover:bg-[#202020]"
       >
         <div className="relative aspect-video overflow-hidden bg-black">

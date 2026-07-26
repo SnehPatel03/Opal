@@ -2,8 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { tr } from "date-fns/locale";
-import { Prosto_One } from "next/font/google";
 
 export const onAuthenticatedUser = async () => {
   try {
@@ -138,5 +136,53 @@ export const searchUsers = async (query: string) => {
     return { status: 400, data: undefined };
   } catch (error) {
     return { status: 500, data: undefined };
+  }
+};
+
+export const getFirstView = async () => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 404 };
+    }
+    const userData = await prisma.user.findUnique({
+      where: {
+        clerkid: user.id,
+      },
+      select: {
+        firstView: true,
+      },
+    });
+    if (userData) {
+      return { status: 200, data: userData.firstView };
+    }
+    return { status: 400 };
+  } catch (error) {
+    console.log("Error in get firts view", error);
+    return { status: 400 };
+  }
+};
+
+export const enableFirstView = async (state: boolean) => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 400 };
+    }
+    const view = await prisma.user.update({
+      where: {
+        clerkid: user.id,
+      },
+      data: {
+        firstView: state,
+      },
+    });
+
+    if (view) {
+      return { status: 200, data: "Setting Updated!" };
+    }
+    return { status: 400 };
+  } catch (error) {
+    return { status: 500 };
   }
 };

@@ -18,12 +18,12 @@ export const MENU_ITEMS = (
 }[] => [
   {
     title: "Home",
-    href: `/dashboard/${workspaceId}`,
+    href: `/dashboard/${workspaceId}/home`,
     icon: <House className="h-5 w-5 text-neutral-400" />,
   },
   {
     title: "Library",
-    href: `/dashboard/${workspaceId}/library`,
+    href: `/dashboard/${workspaceId}`,
     icon: <FolderArchive className="h-5 w-5 text-neutral-400" />,
   },
   {

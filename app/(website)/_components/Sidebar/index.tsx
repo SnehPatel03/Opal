@@ -28,7 +28,6 @@ import SearchBar from "../SearchBar";
 import { useDispatch } from "react-redux";
 import { WORKSPACES } from "@/redux/slices/workspaces";
 
-
 type Props = {
   activeWorkspaceId: string;
 };
@@ -36,28 +35,33 @@ type Props = {
 const Sidebar = ({ activeWorkspaceId }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
-const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+
   const { data, isFetched } = userQueryData(
     ["user-workspaces"],
     getWorkspaces,
   );
-  const {data:workspace} = data as WorkspaceProps
+  const { data: workspace } = data as WorkspaceProps;
 
   useEffect(() => {
-  const openSidebar = () => setSidebarOpen(true);
-
-  window.addEventListener("open-sidebar", openSidebar);
-
-  return () =>
-    window.removeEventListener("open-sidebar", openSidebar);
-}, []);
+    const openSidebar = () => setSidebarOpen(true);
+    window.addEventListener("open-sidebar", openSidebar);
+    return () => window.removeEventListener("open-sidebar", openSidebar);
+  }, []);
 
   const { data: notifications } = userQueryData(
     ["user-notifications"],
     getNotifications,
   );
 
-  // const workspace = (workspaces as WorkspaceProps | undefined)?.data;
   const count = (notifications as NotifactionProps | undefined)?.data;
 
   const [selectedWorkspaceId, setSelectedWorkspaceId] =
@@ -67,31 +71,26 @@ const dispatch = useDispatch()
 
   const selectedWorkspaceName = useMemo(() => {
     if (!workspace) return "";
-
     const own = workspace.workspace.find(
       (workspace) => workspace.id === selectedWorkspaceId,
     );
-
     if (own) return own.name;
-
     const member = workspace.members.find(
-      (member) => member.Workspace.id === selectedWorkspaceId,
+      (member) => member.WorkSpace.id === selectedWorkspaceId,
     );
-
-    return member?.Workspace.name ?? "";
+    return member?.WorkSpace.name ?? "";
   }, [workspace, selectedWorkspaceId]);
 
   const currentWorkspace = workspace?.workspace.find(
     (workspace) => workspace.id === activeWorkspaceId,
   );
 
-
-  if(isFetched && workspace){
-    dispatch(WORKSPACES(workspace.workspace))
+  if (isFetched && workspace) {
+    dispatch(WORKSPACES(workspace.workspace));
   }
+
   const onChangeActiveWorkspace = (value: string | null) => {
     if (!value) return;
-
     setSelectedWorkspaceId(value);
     router.push(`/dashboard/${value}`);
   };
@@ -110,7 +109,6 @@ const dispatch = useDispatch()
           height={32}
           priority
         />
-
         <h1 className="text-2xl font-semibold">Opal</h1>
       </div>
 
@@ -128,7 +126,6 @@ const dispatch = useDispatch()
           <SelectContent className="border-zinc-800 bg-[#111111] text-neutral-200">
             <SelectGroup>
               <SelectLabel>Workspaces</SelectLabel>
-
               {isFetched &&
                 workspace?.workspace.map((item) => (
                   <SelectItem key={item.id} value={item.id}>
@@ -144,13 +141,12 @@ const dispatch = useDispatch()
                   <SelectLabel>
                     Member Workspaces ({workspace.members.length})
                   </SelectLabel>
-
                   {workspace.members.map((member) => (
                     <SelectItem
-                      key={member.Workspace.id}
-                      value={member.Workspace.id}
+                      key={member.WorkSpace.id}
+                      value={member.WorkSpace.id}
                     >
-                      {member.Workspace.name}
+                      {member.WorkSpace.name}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -159,7 +155,9 @@ const dispatch = useDispatch()
           </SelectContent>
         </Select>
 
-        {currentWorkspace?.type === "PUBLIC" &&
+
+        {mounted &&
+          currentWorkspace?.type === "PUBLIC" &&
           workspace?.subscription?.plan === "PRO" && (
             <Modal
               title="Invite To Workspace"
@@ -176,8 +174,10 @@ const dispatch = useDispatch()
               </div>
             </Modal>
           )}
+
         <SelectSeparator className="mt-2" />
-        <div className=" mt-2 mb-2 px-1">
+
+        <div className="mt-2 mb-2 px-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Menu
           </p>
@@ -200,76 +200,80 @@ const dispatch = useDispatch()
           </ul>
         </nav>
 
-        <div className="flex items-center justify-between border-b border-zinc-800/60 px-3 py-2 mt-6">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-              Workspaces
-            </p>
-          </div>
-        </div>
-        {ownedWorkspaces.length > 0 ? (
-          <div className="relative mt-2 overflow-hidden rounded-lg border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl">
-            <div className="pointer-events-none absolute top-0 left-0 z-20 h-8 w-full bg-linear-to-b from-[#151515] via-[#151515]/90 to-transparent" />
-
-            <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-8 w-full bg-linear-to-t from-[#151515] via-[#151515]/90 to-transparent" />
-
-            <div className="no-scrollbar max-h-40 space-y-0.5 overflow-y-auto p-2 py-2 scroll-smooth">
-              {ownedWorkspaces.map((item) => (
-                <SidebarItem
-                  key={item.id}
-                  title={item.name}
-                  href={`/dashboard/${item.id}`}
-                  selected={pathname === `/dashboard/${item.id}`}
-                  icon={
-                    <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-100 text-[11px] font-semibold text-zinc-900">
-                      {item.name.charAt(0).toUpperCase()}
-                    </div>
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-2 rounded-lg border border-dashed border-zinc-800 py-6 text-center">
-            <p className="text-xs text-zinc-400">No Workspaces</p>
-          </div>
-        )}
-        <div className="mt-2 space-y-0.5">
-          {workspace?.workspace.length === 1 &&
-            workspace.members.length === 0 && (
-              <div className="w-full">
-                <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
-                  {workspace.subscription?.plan === "FREE"
-                    ? "Upgrade to Create Workspaces."
-                    : ""}
+        {mounted && (
+          <>
+            <div className="flex items-center justify-between border-b border-zinc-800/60 px-3 py-2 mt-6">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                  Workspaces
                 </p>
               </div>
+            </div>
+            {ownedWorkspaces.length > 0 ? (
+              <div className="relative mt-2 overflow-hidden rounded-lg border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl">
+                <div className="pointer-events-none absolute top-0 left-0 z-20 h-8 w-full bg-linear-to-b from-[#151515] via-[#151515]/90 to-transparent" />
+                <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-8 w-full bg-linear-to-t from-[#151515] via-[#151515]/90 to-transparent" />
+                <div className="no-scrollbar max-h-40 space-y-0.5 overflow-y-auto p-2 py-2 scroll-smooth">
+                  {ownedWorkspaces.map((item) => (
+                    <SidebarItem
+                      key={item.id}
+                      title={item.name}
+                      href={`/dashboard/${item.id}`}
+                      selected={pathname === `/dashboard/${item.id}`}
+                      icon={
+                        <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-100 text-[11px] font-semibold text-zinc-900">
+                          {item.name.charAt(0).toUpperCase()}
+                        </div>
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-2 rounded-lg border border-dashed border-zinc-800 py-6 text-center">
+                <p className="text-xs text-zinc-400">No Workspaces</p>
+              </div>
             )}
-          {workspace?.members?.map((member) => (
+          </>
+        )}
+
+        {mounted &&
+          workspace?.members?.map((member) => (
             <SidebarItem
-              key={member.Workspace.name}
-              title={member.Workspace.name}
-              href={`/dashboard/${member.Workspace.id}`}
-              selected={pathname === `/dashboard/${member.Workspace.id}`}
+              key={member.WorkSpace.id}
+              title={member.WorkSpace.name}
+              href={`/dashboard/${member.WorkSpace.id}`}
+              selected={pathname === `/dashboard/${member.WorkSpace.id}`}
               icon={
                 <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-800 text-[10px] font-semibold text-zinc-200">
-                  {member.Workspace.name.charAt(0).toUpperCase()}
+                  {member.WorkSpace.name.charAt(0).toUpperCase()}
                 </div>
               }
             />
           ))}
-        </div>
-        {workspace?.subscription?.plan === "FREE" && (
+
+        {mounted && workspace?.subscription?.plan === "FREE" && (
           <GlobalCard
-            className="mt-auto "
+            className="mt-auto"
             title="Upgrade to Pro"
-            description="Unlock AI Features like transcription, AI Summary  and effortless collaboration."
+            description="Unlock AI Features like transcription, AI Summary and effortless collaboration."
             footer={
               <button className="w-full rounded-lg bg-neutral-200 py-2 text-sm font-medium text-black transition hover:bg-zinc-200">
                 Upgrade Now
               </button>
             }
           />
+        )}
+
+        {/* This block is already safe because it only depends on workspace, but we include it in mounted for consistency */}
+        {mounted && workspace?.workspace.length === 1 && workspace.members.length === 0 && (
+          <div className="w-full">
+            <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
+              {workspace.subscription?.plan === "FREE"
+                ? "Upgrade to Create Workspaces."
+                : ""}
+            </p>
+          </div>
         )}
       </div>
     </aside>
@@ -278,7 +282,6 @@ const dispatch = useDispatch()
   return (
     <>
       <div className="hidden lg:flex">{sidebarContent}</div>
-    
 
       <div
         onClick={() => setSidebarOpen(false)}

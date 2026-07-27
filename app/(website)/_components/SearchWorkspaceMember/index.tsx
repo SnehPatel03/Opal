@@ -7,6 +7,7 @@ import Image from "next/image";
 
 import { useSearch } from "@/hooks/useSearch";
 import { useMutationData } from "@/hooks/useMutationData";
+import { inviteMember } from "@/actions/user";
 
 type Props = {
   workspaceId: string;
@@ -15,18 +16,18 @@ type Props = {
 const SearchWorkspaceMember = ({ workspaceId }: Props) => {
   const { query, onSearchQuery, isFetching, onUsers } = useSearch(
     "get-users",
-    "USERS"
+    "USERS",
   );
 
-  // Work In Progress
-  // const { mutate, isPending } = useMutationData(
-  //   ["invite-member"],
-  //   (data: { receiverId: string; email: string }) => {}
-  // );
+  // invitation to memeber
+  const { mutate, isPending } = useMutationData(
+    ["invite-member"],
+    (data: { receiverId: string; email: string }) =>
+      inviteMember(data.receiverId, workspaceId, data.email),
+  );
 
   return (
     <div className="space-y-5">
-      {/* Search */}
       <div className="relative">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
@@ -42,14 +43,11 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
         />
       </div>
 
-      {/* Loading */}
       {isFetching && (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
         </div>
       )}
-
-      {/* User List */}
       {!isFetching && onUsers && onUsers.length > 0 && (
         <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
           {onUsers.map((user) => (
@@ -71,9 +69,7 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
                     {user.firstname} {user.lastname}
                   </span>
 
-                  <span className="text-xs text-neutral-400">
-                    {user.email}
-                  </span>
+                  <span className="text-xs text-neutral-400">{user.email}</span>
 
                   {user.subscription?.plan && (
                     <span
@@ -90,6 +86,9 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
               </div>
 
               <button
+                onClick={() => {
+                  mutate({ receiverId: user.id, email: user.email });
+                }}
                 className="flex items-center gap-2 rounded-lg bg-neutral-200 px-3 py-2 text-xs font-medium text-black transition hover:bg-neutral-200"
               >
                 <UserPlus size={15} />
@@ -100,7 +99,6 @@ const SearchWorkspaceMember = ({ workspaceId }: Props) => {
         </div>
       )}
 
-      {/* Empty State */}
       {!isFetching && query && (!onUsers || onUsers.length === 0) && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-neutral-800 py-10">
           <Search size={28} className="mb-3 text-neutral-600" />

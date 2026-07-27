@@ -27,7 +27,6 @@ const ActivityPage = ({ author, videoId }: Props) => {
   className="mt-5 h-[calc(100vh-500px)]"
 >
   <div className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[#171717]">
-    {/* Header */}
     <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4 shrink-0">
       <div className="flex items-center gap-2">
         <MessageCircle className="h-4 w-4 text-zinc-400" />
@@ -42,12 +41,10 @@ const ActivityPage = ({ author, videoId }: Props) => {
       </div>
     </div>
 
-    {/* Comment Form */}
     <div className="border-b border-zinc-800 px-5 py-4 shrink-0">
       <CommentForm author={author} videoId={videoId} />
     </div>
 
-    {/* Scrollable Comments */}
     <div className="flex-1 overflow-y-auto">
       <div className="divide-y divide-zinc-800">
         {comments.length > 0 ? (

@@ -3,7 +3,7 @@ import { getPreviewVideo } from "@/actions/workspace";
 import { userQueryData } from "@/hooks/userQueryData";
 import { VideoProps } from "@/types/index.type";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import CopyLink from "../../CopyLink";
 import RichLink from "../../RichLink";
 import { truncateString } from "@/lib/utils";
@@ -12,17 +12,24 @@ import TabsComponent from "../../tabs";
 import AiTools from "../../AI-Tools ";
 import VideoTranscript from "../../VideoTranscript";
 import ActivityPage from "../../Activity";
+import { sendEmailForFirstView } from "@/actions/user";
 
 type Props = {
   videoId: string;
 };
 
 const VideoPriview = ({ videoId }: Props) => {
-  //WIP:set notify first view
-  //WIP: Activity tab contact setup
   const router = useRouter();
+  const hasNotifiedFirstView = useRef(false);
+
   const { data } = userQueryData(["preview-video", videoId], () =>
     getPreviewVideo(videoId),
+    {
+      // Keep the SSR snapshot through hydration. A mount-time refetch can return
+      // a changed view count before React has hydrated this text node.
+      staleTime: 60_000,
+      refetchOnMount: false,
+    },
   );
 
   const { data: video, status, relativeDate } = data as VideoProps;
@@ -40,6 +47,13 @@ const VideoPriview = ({ videoId }: Props) => {
       router.push("/");
     }
   }, [data, status, router]);
+
+  useEffect(() => {
+    if (!hasNotifiedFirstView.current && video.views === 0) {
+      hasNotifiedFirstView.current = true;
+      void sendEmailForFirstView(videoId);
+    }
+  }, [video.views, videoId]);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-10">
@@ -67,7 +81,6 @@ const VideoPriview = ({ videoId }: Props) => {
               <source src={videoSource} />
             </video>
           </div>
-
 
           {/* Description */}
           <div className="rounded-2xl border border-zinc-800 bg-[#171717] p-6">
@@ -110,7 +123,10 @@ const VideoPriview = ({ videoId }: Props) => {
               />
               <VideoTranscript transcript={video.description ?? ""} />
               <ActivityPage
-                author={`${video.User?.firstname ?? ""} ${video.User?.lastname ?? ""}`.trim() || "this video"}
+                author={
+                  `${video.User?.firstname ?? ""} ${video.User?.lastname ?? ""}`.trim() ||
+                  "this video"
+                }
                 videoId={videoId}
               />
             </TabsComponent>

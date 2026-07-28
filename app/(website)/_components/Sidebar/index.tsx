@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, PlusCircle, X } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 
 import {
   Select,
@@ -24,7 +24,6 @@ import { Modal } from "../Modal";
 import SearchWorkspaceMember from "../SearchWorkspaceMember";
 import SidebarItem from "./SidebarItems";
 import GlobalCard from "../GlobalCard";
-import SearchBar from "../SearchBar";
 import { useDispatch } from "react-redux";
 import { WORKSPACES } from "@/redux/slices/workspaces";
 
@@ -38,11 +37,12 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const dispatch = useDispatch();
 
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
   const { data, isFetched } = userQueryData(
@@ -67,8 +67,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const [selectedWorkspaceId, setSelectedWorkspaceId] =
     useState(activeWorkspaceId);
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const selectedWorkspaceName = useMemo(() => {
     if (!workspace) return "";
     const own = workspace.workspace.find(
@@ -76,18 +74,20 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     );
     if (own) return own.name;
     const member = workspace.members.find(
-      (member) => member.WorkSpace.id === selectedWorkspaceId,
+      (member) => member.Workspace.id === selectedWorkspaceId,
     );
-    return member?.WorkSpace.name ?? "";
+    return member?.Workspace.name ?? "";
   }, [workspace, selectedWorkspaceId]);
 
   const currentWorkspace = workspace?.workspace.find(
     (workspace) => workspace.id === activeWorkspaceId,
   );
 
-  if (isFetched && workspace) {
-    dispatch(WORKSPACES(workspace.workspace));
-  }
+  useEffect(() => {
+    if (isFetched && workspace) {
+      dispatch(WORKSPACES(workspace.workspace));
+    }
+  }, [dispatch, isFetched, workspace]);
 
   const onChangeActiveWorkspace = (value: string | null) => {
     if (!value) return;
@@ -98,6 +98,10 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const menuItems = MENU_ITEMS(activeWorkspaceId);
   const ownedWorkspaces =
     workspace?.workspace.filter((item) => item.type !== "PERSONAL") ?? [];
+  const listedWorkspaces = [
+    ...ownedWorkspaces,
+    ...(workspace?.members.map((member) => member.Workspace) ?? []),
+  ];
 
   const sidebarContent = (
     <aside className="flex h-screen w-64 flex-col overflow-hidden border-r border-zinc-800 bg-[#111111] text-neutral-200">
@@ -119,7 +123,9 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         >
           <SelectTrigger className="w-full border-zinc-700 bg-zinc-900 text-sm">
             <SelectValue placeholder="Select Workspace">
-              {selectedWorkspaceName || "Select Workspace"}
+              {mounted
+                ? selectedWorkspaceName || "Select Workspace"
+                : "Select Workspace"}
             </SelectValue>
           </SelectTrigger>
 
@@ -143,10 +149,10 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                   </SelectLabel>
                   {workspace.members.map((member) => (
                     <SelectItem
-                      key={member.WorkSpace.id}
-                      value={member.WorkSpace.id}
+                      key={member.Workspace.id}
+                      value={member.Workspace.id}
                     >
-                      {member.WorkSpace.name}
+                      {member.Workspace.name}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -191,7 +197,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 {...item}
                 selected={pathname === item.href}
                 notification={
-                  item.title === "Notifications"
+                  mounted && item.title === "Notifications"
                     ? (count?._count?.notification ?? 0)
                     : undefined
                 }
@@ -209,19 +215,19 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 </p>
               </div>
             </div>
-            {ownedWorkspaces.length > 0 ? (
+            {listedWorkspaces.length > 0 ? (
               <div className="relative mt-2 overflow-hidden rounded-lg border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl">
                 <div className="pointer-events-none absolute top-0 left-0 z-20 h-8 w-full bg-linear-to-b from-[#151515] via-[#151515]/90 to-transparent" />
                 <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-8 w-full bg-linear-to-t from-[#151515] via-[#151515]/90 to-transparent" />
                 <div className="no-scrollbar max-h-40 space-y-0.5 overflow-y-auto p-2 py-2 scroll-smooth">
-                  {ownedWorkspaces.map((item) => (
+                  {listedWorkspaces.map((item) => (
                     <SidebarItem
                       key={item.id}
                       title={item.name}
                       href={`/dashboard/${item.id}`}
                       selected={pathname === `/dashboard/${item.id}`}
                       icon={
-                        <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-100 text-[11px] font-semibold text-zinc-900">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-neutral-600 text-[11px] font-semibold text-black">
                           {item.name.charAt(0).toUpperCase()}
                         </div>
                       }
@@ -236,21 +242,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             )}
           </>
         )}
-
-        {mounted &&
-          workspace?.members?.map((member) => (
-            <SidebarItem
-              key={member.WorkSpace.id}
-              title={member.WorkSpace.name}
-              href={`/dashboard/${member.WorkSpace.id}`}
-              selected={pathname === `/dashboard/${member.WorkSpace.id}`}
-              icon={
-                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/80 bg-zinc-800 text-[10px] font-semibold text-zinc-200">
-                  {member.WorkSpace.name.charAt(0).toUpperCase()}
-                </div>
-              }
-            />
-          ))}
 
         {mounted && workspace?.subscription?.plan === "FREE" && (
           <GlobalCard

@@ -12,7 +12,7 @@ export type WorkspaceProps = {
     }[];
 
     members: {
-      WorkSpace: {
+      Workspace: {
         id: string;
         name: string;
         type: "PUBLIC" | "PERSONAL";
@@ -66,7 +66,7 @@ export type VideoProps = {
     title: string | null;
     description: string | null;
     source: string;
-    views: string;
+    views: number;
     createdAt: Date;
     processing: boolean;
     summery: string;

@@ -336,7 +336,7 @@ export const inviteMember = async (
 
         await prisma.user.update({
           where: {
-            id:receiverId,
+            id: receiverId,
           },
           data: {
             notification: {
@@ -414,5 +414,149 @@ export const inviteMember = async (
   } catch (error) {
     console.log("error in mail sending or memeber action :", error);
     return { status: 400, data: "Oops! Something went wrong" };
+  }
+};
+
+export const acceptInvite = async (inviteId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 404 };
+    }
+
+    const invite = await prisma.invite.findUnique({
+      where: {
+        id: inviteId,
+      },
+      select: {
+        workspaceId: true,
+        receiver: {
+          select: {
+            clerkid: true,
+          },
+        },
+      },
+    });
+    if (!invite) {
+      return { status: 404, data: "Invitation not found" };
+    }
+
+    if (user.id !== invite?.receiver.clerkid)
+      return { status: 401, data: "Unauthorized user!" };
+
+    const acceptInvite = prisma.invite.update({
+      where: {
+        id: inviteId,
+      },
+      data: {
+        accepted: true,
+      },
+    });
+
+    const updateMember = prisma.user.update({
+      where: {
+        clerkid: user.id,
+      },
+      data: {
+        members: {
+          create: {
+            workspaceId: invite.workspaceId,
+          },
+        },
+      },
+    });
+
+    const membersTransaction = await prisma.$transaction([
+      acceptInvite,
+      updateMember,
+    ]);
+    if (membersTransaction) {
+      return { status: 200 };
+    }
+    return { status: 400 };
+  } catch (error) {
+    return { status: 400 };
+  }
+};
+
+export const sendEmailForFirstView = async (videoId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 404 };
+    }
+    const firstViewSettings = await prisma.user.findUnique({
+      where: {
+        clerkid: user.id,
+      },
+      select: {
+        firstView: true,
+      },
+    });
+    if (!firstViewSettings?.firstView) return;
+
+    const video = await prisma.video.findUnique({
+      where: {
+        id: videoId,
+      },
+      select: {
+        views: true,
+        title: true,
+        User: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
+    if (video && video.views === 0) {
+      await prisma.video.update({
+        where: {
+          id: videoId,
+        },
+        data: {
+          views: video.views + 1,
+        },
+      });
+
+      if (!video.User?.email)
+        return {
+          status: 404,
+          data: "No email found to sent!{Typicall bug in db design for mail send for first view}",
+        };
+
+      const { transporter, mailOptions } = sendEmail(
+        video.User?.email,
+        "You got your First Viewer.",
+        `Your Video ${video.title} just got a first viewer.`,
+      );
+
+      try {
+        await transporter.sendMail(mailOptions);
+        const notification = await prisma.user.update({
+          where: {
+            clerkid: user.id,
+          },
+          data: {
+            notification: {
+              create: {
+                content: `Your Video ${video.title} just got a first viewer.`,
+              },
+            },
+          },
+        });
+        if (!notification) {
+          return { status: 404 };
+        }
+      } catch (error) {
+        console.log(
+          "Error in mail sending for first view or in notification",
+          error,
+        );
+      }
+    }
+  } catch (error) {
+    console.log("Error in SendEmailForFV action", error);
+    return { status: 404 };
   }
 };

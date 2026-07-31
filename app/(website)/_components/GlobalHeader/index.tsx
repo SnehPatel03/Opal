@@ -14,7 +14,7 @@ const GlobalHeader = ({ workspace }: Props) => {
 
   const title =
     currentPath && !currentPath.includes("folder")
-      ? currentPath.replace("/", "").replace(/-/g, " ")
+      ? ''
       : "My Library";
 
   return (

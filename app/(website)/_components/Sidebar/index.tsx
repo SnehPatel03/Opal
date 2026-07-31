@@ -26,6 +26,7 @@ import SidebarItem from "./SidebarItems";
 import GlobalCard from "../GlobalCard";
 import { useDispatch } from "react-redux";
 import { WORKSPACES } from "@/redux/slices/workspaces";
+import PaymentButton from "../Payment-Button";
 
 type Props = {
   activeWorkspaceId: string;
@@ -249,9 +250,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             title="Upgrade to Pro"
             description="Unlock AI Features like transcription, AI Summary and effortless collaboration."
             footer={
-              <button className="w-full rounded-lg bg-neutral-200 py-2 text-sm font-medium text-black transition hover:bg-zinc-200">
-                Upgrade Now
-              </button>
+              <PaymentButton/>
             }
           />
         )}

@@ -25,8 +25,6 @@ const VideoPriview = ({ videoId }: Props) => {
   const { data } = userQueryData(["preview-video", videoId], () =>
     getPreviewVideo(videoId),
     {
-      // Keep the SSR snapshot through hydration. A mount-time refetch can return
-      // a changed view count before React has hydrated this text node.
       staleTime: 60_000,
       refetchOnMount: false,
     },
@@ -82,7 +80,6 @@ const VideoPriview = ({ videoId }: Props) => {
             </video>
           </div>
 
-          {/* Description */}
           <div className="rounded-2xl border border-zinc-800 bg-[#171717] p-6">
             <h3 className="mb-4 text-lg font-semibold text-white">
               Description

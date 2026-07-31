@@ -5,6 +5,10 @@ import { prisma } from "@/lib/prisma";
 
 import { currentUser } from "@clerk/nextjs/server";
 import nodemailer from "nodemailer";
+import { use } from "react";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export const onAuthenticatedUser = async () => {
   try {
@@ -527,8 +531,108 @@ export const sendEmailForFirstView = async (videoId: string) => {
 
       const { transporter, mailOptions } = sendEmail(
         video.User?.email,
-        "You got your First Viewer.",
-        `Your Video ${video.title} just got a first viewer.`,
+        "🎉 You got your first viewer on Opal!",
+        `Your video "${video.title}" just received its first viewer.`,
+        `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="margin:0;padding:0;background:#0f0f11;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0f0f11;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0"
+          style="background:#17181c;border:1px solid #2b2d31;border-radius:16px;overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:32px;text-align:center;background:linear-gradient(135deg,#6d5efc,#4f46e5);">
+              <h1 style="margin:0;font-size:34px;font-weight:700;color:#ffffff;">
+                Opal
+              </h1>
+              <p style="margin-top:10px;color:#e6e6ff;font-size:15px;">
+                AI Workspace for Modern Creators
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:40px 35px;">
+
+              <h2 style="margin:0 0 18px;font-size:28px;color:#ffffff;">
+                🎉 Congratulations!
+              </h2>
+
+              <p style="margin:0 0 18px;font-size:16px;line-height:1.8;color:#d1d5db;">
+                Your video has just received its
+                <strong style="color:#ffffff;">first viewer</strong>.
+              </p>
+
+              <div style="
+                  margin:28px 0;
+                  padding:22px;
+                  background:#202228;
+                  border:1px solid #34363d;
+                  border-radius:12px;
+              ">
+                <p style="margin:0 0 8px;color:#9ca3af;font-size:13px;text-transform:uppercase;letter-spacing:1px;">
+                  Video
+                </p>
+
+                <h3 style="margin:0;font-size:22px;color:#ffffff;">
+                  ${video.title}
+                </h3>
+              </div>
+
+              <p style="margin:0 0 30px;font-size:16px;line-height:1.8;color:#d1d5db;">
+                Every successful creator starts with a single viewer.
+                Keep publishing consistently and watch your audience grow.
+              </p>
+
+              <div style="text-align:center;">
+                <a
+                  href="${process.env.NEXT_PUBLIC_HOST_URL}/dashboard"
+                  style="
+                    display:inline-block;
+                    background:#6d5efc;
+                    color:#ffffff;
+                    text-decoration:none;
+                    padding:14px 34px;
+                    border-radius:10px;
+                    font-size:16px;
+                    font-weight:600;
+                  ">
+                  Open Dashboard
+                </a>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:28px;text-align:center;border-top:1px solid #2b2d31;">
+              <p style="margin:0;color:#6b7280;font-size:13px;">
+                Thanks for creating with <strong style="color:#ffffff;">Opal</strong>.
+              </p>
+
+              <p style="margin-top:10px;color:#6b7280;font-size:12px;">
+                © ${new Date().getFullYear()} Opal. All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`,
       );
 
       try {
@@ -557,6 +661,41 @@ export const sendEmailForFirstView = async (videoId: string) => {
     }
   } catch (error) {
     console.log("Error in SendEmailForFV action", error);
+    return { status: 404 };
+  }
+};
+
+export const completeSubscription = async (session_id: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { status: 404 };
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    if (session) {
+      const customer = await prisma.user.update({
+        where: {
+          clerkid: user.id,
+        },
+        data: {
+          subscription: {
+            update: {
+              data: {
+                customerId: session.customer as string,
+                plan: "PRO",
+              },
+            },
+          },
+        },
+      });
+      if (customer) {
+        return { status: 200 };
+      }
+    }
+    return { status: 404 };
+  } catch (error) {
+    console.log("Error in payment action", error);
     return { status: 404 };
   }
 };

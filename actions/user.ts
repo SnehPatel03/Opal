@@ -664,38 +664,44 @@ export const sendEmailForFirstView = async (videoId: string) => {
     return { status: 404 };
   }
 };
-
 export const completeSubscription = async (session_id: string) => {
   try {
-    const user = await currentUser();
-    if (!user) {
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+
+    const clerkId = session.metadata!.clerkId;
+
+    if (!clerkId) {
       return { status: 404 };
     }
 
-    const session = await stripe.checkout.sessions.retrieve(session_id);
-    if (session) {
-      const customer = await prisma.user.update({
-        where: {
-          clerkid: user.id,
-        },
-        data: {
-          subscription: {
-            update: {
-              data: {
-                customerId: session.customer as string,
-                plan: "PRO",
-              },
-            },
+    const user = await prisma.user.update({
+      where: {
+        clerkid: clerkId,
+      },
+      data: {
+        subscription: {
+          update: {
+            customerId: session.customer as string,
+            plan: "PRO",
           },
         },
-      });
-      if (customer) {
-        return { status: 200 };
-      }
-    }
-    return { status: 404 };
+      },
+      include: {
+        workspace: {
+          take: 1,
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      workspaceId: user.workspace[0].id,
+    };
   } catch (error) {
-    console.log("Error in payment action", error);
-    return { status: 404 };
+    console.error(error);
+    return { status: 500 };
   }
 };

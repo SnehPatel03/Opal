@@ -46,6 +46,7 @@ export async function GET(
         email: clerkUserInstance.emailAddresses[0].emailAddress,
         firstname: clerkUserInstance.firstName,
         lastname: clerkUserInstance.lastName,
+        image: clerkUserInstance.imageUrl,
 
         studio: {
           create: {},

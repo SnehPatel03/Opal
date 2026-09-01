@@ -5,9 +5,12 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-export async function POST(req: NextRequest, { params }: Props) {
+export async function POST(
+  req: NextRequest,
+  { params }: Props,
+) {
   try {
-    const { id } = await params;
+    const { id: mediaId } = await params;
     const body = await req.json();
 
     if (!body.filename) {
@@ -20,9 +23,10 @@ export async function POST(req: NextRequest, { params }: Props) {
       );
     }
 
+    // 1. Find the Media using the Media ID
     const media = await prisma.media.findUnique({
       where: {
-        id,
+        id: mediaId,
       },
       select: {
         userId: true,
@@ -39,32 +43,29 @@ export async function POST(req: NextRequest, { params }: Props) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: media.userId,
-      },
-      select: {
-        workspace: {
-          where: {
-            type: "PERSONAL",
-          },
-          select: {
-            id: true,
-          },
-          orderBy: {
-            createdAt: "asc",
-          },
-          take: 1,
+    // 2. Find the user's personal workspace
+    const personalWorkspace =
+      await prisma.user.findUnique({
+        where: {
+          id: media.userId,
         },
-        subscription: {
-          select: {
-            plan: true,
+        select: {
+          workspace: {
+            where: {
+              type: "PERSONAL",
+            },
+            select: {
+              id: true,
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+            take: 1,
           },
         },
-      },
-    });
+      });
 
-    if (!user) {
+    if (!personalWorkspace) {
       return NextResponse.json(
         {
           status: 404,
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest, { params }: Props) {
       );
     }
 
-    const workspace = user.workspace[0];
+    const workspace = personalWorkspace.workspace[0];
 
     if (!workspace) {
       return NextResponse.json(
@@ -86,23 +87,38 @@ export async function POST(req: NextRequest, { params }: Props) {
       );
     }
 
-    await prisma.workspace.update({
-      where: {
-        id: workspace.id,
-      },
-      data: {
-        videos: {
-          create: {
-            source: body.filename,
-            userId: media.userId,
+    // 3. Create the video in that workspace
+    const startProcessingVideo =
+      await prisma.workspace.update({
+        where: {
+          id: workspace.id,
+        },
+        data: {
+          videos: {
+            create: {
+              source: body.filename,
+              userId: media.userId,
+            },
           },
         },
-      },
-    });
+        select: {
+          User: {
+            select: {
+              subscription: {
+                select: {
+                  plan: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
     return NextResponse.json({
       status: 200,
-      plan: user.subscription?.plan ?? "FREE",
+      plan:
+        startProcessingVideo.User?.subscription
+          ?.plan ?? "FREE",
     });
   } catch (error) {
     console.error(

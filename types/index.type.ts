@@ -70,6 +70,7 @@ export type VideoProps = {
     createdAt: Date;
     processing: boolean;
     summery: string;
+    videoUrl:string
   };
   author: boolean;
   relativeDate: string;

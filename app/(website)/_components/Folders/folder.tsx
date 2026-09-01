@@ -1,10 +1,10 @@
 "use client";
 
-import { renameFolder } from "@/actions/workspace";
+import { deleteFolder, renameFolder } from "@/actions/workspace";
 import { Input } from "@/components/ui/input";
 import { useMutationData } from "@/hooks/useMutationData";
 import { cn } from "@/lib/utils";
-import { FolderIcon } from "lucide-react";
+import { FolderIcon, Trash2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
@@ -32,6 +32,12 @@ console.log("count",count)
     }
   );
 
+  const { mutate: removeFolder, isPending: isDeleting } = useMutationData(
+    ["delete-folder"],
+    () => deleteFolder(id),
+    "workspace-folders",
+  );
+
   const updateFolderName = () => {
     const newName = inputRef.current?.value.trim();
 
@@ -49,15 +55,37 @@ console.log("count",count)
     router.push(`${pathname}/folder/${id}`);
   };
 
+  const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    if (
+      window.confirm(
+        `Delete “${name}”? Videos in this folder will remain in the workspace.`,
+      )
+    ) {
+      removeFolder({});
+    }
+  };
+
   return (
     <div
       onClick={handleFolderClick}
       className={cn(
-        "group flex min-w-55 cursor-pointer flex-col gap-3 rounded-2xl border border-zinc-800 bg-[#171717] p-4 transition-all duration-200",
-        "hover:border-zinc-700 hover:bg-zinc-900",
+        "group relative flex min-w-55 cursor-pointer flex-col gap-3 rounded-2xl border border-zinc-800 bg-[#171717] p-4 transition-all duration-200",
+        "hover:border-zinc-700 hover:bg-zinc-900 hover:shadow-xl hover:shadow-black/20",
         optimistic && "animate-pulse opacity-60"
       )}
     >
+      <button
+        type="button"
+        aria-label={`Delete ${name}`}
+        disabled={isDeleting}
+        onClick={handleDelete}
+        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800/90 text-zinc-400 opacity-0 shadow-lg shadow-black/20 transition-all duration-200 hover:border-zinc-500 hover:bg-zinc-700 hover:text-zinc-100 group-hover:opacity-100 focus:opacity-100 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+
       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-800 transition-colors group-hover:bg-zinc-700">
         <FolderIcon className="h-5.5 w-5.5 text-zinc-300" />
       </div>

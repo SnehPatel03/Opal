@@ -9,6 +9,7 @@ import {
 
 import CreateFolders from "@/app/(website)/_components/CreateFolders";
 import Folders from "@/app/(website)/_components/Folders";
+import Videos from "@/app/(website)/_components/videos";
 
 type Props = {
   params: Promise<{
@@ -42,7 +43,15 @@ const WorkspacePage = async({ params }: Props) => {
         </div>
 
         <TabsContent value="videos" className="pt-8">
-          <Folders workspaceId={workspaceId} />
+          <div className="space-y-10">
+            <Folders workspaceId={workspaceId} />
+            <Videos
+              workspaceId={workspaceId}
+              folderId={workspaceId}
+              videoKey="workspace-videos"
+              limit={10}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="archive" className="pt-8">

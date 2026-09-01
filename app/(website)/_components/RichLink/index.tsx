@@ -12,6 +12,14 @@ type Props = {
 };
 
 const RichLink = ({ title, description, source, id }: Props) => {
+  const imageKitUrlEndpoint =
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT?.replace(/\/+$/, "");
+  const videoSource = /^https?:\/\//i.test(source)
+    ? source
+    : imageKitUrlEndpoint
+      ? `${imageKitUrlEndpoint}/${source.replace(/^\/+/, "")}`
+      : "";
+
   const copyLink = async () => {
     const previewUrl = `${process.env.NEXT_PUBLIC_HOST_URL}/preview/${id}`;
 
@@ -40,7 +48,7 @@ const RichLink = ({ title, description, source, id }: Props) => {
           style="display:block;border-radius:10px;"
         >
           <source
-            src="${process.env.NEXT_PUBLIC_CLOUD_FRONT_STREAM_URL}/${source}"
+            src="${videoSource}"
             type="video/mp4"
           />
         </video>

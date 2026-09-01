@@ -134,6 +134,8 @@ model Video {
   title       String?  @default("Untitled Video")
   description String?  @default("No Description")
   source      String   @unique
+  videoUrl    String?
+  fileId      String?
   createdAt   DateTime @default(now())
 
   Folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)

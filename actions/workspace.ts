@@ -5,6 +5,17 @@ import { currentUser } from "@clerk/nextjs/server";
 
 export const verifyAccessToWorkspace = async (workspaceId: string) => {
   try {
+    // Route segments can also be requested by the browser for a relative media
+    // URL. Do not send a filename (or any non-UUID) to PostgreSQL's UUID field.
+    const isWorkspaceId =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        workspaceId,
+      );
+
+    if (!isWorkspaceId) {
+      return { status: 404, data: { workspace: null } };
+    }
+
     const user = await currentUser();
 
     if (!user) {
@@ -102,6 +113,7 @@ export const getAllUserVideos = async (workspaceId: string) => {
         title: true,
         createdAt: true,
         source: true,
+        videoUrl:true,
         processing: true,
         Folder: {
           select: {
@@ -273,6 +285,55 @@ export const renameFolder = async (folderId: string, name: string) => {
     return { status: 400, data: "oops Something went wrong!" };
   }
 };
+
+export const deleteFolder = async (folderId: string) => {
+  try {
+    // A Folder -> Video relation cascades deletes in the schema. Keep the videos
+    // available in the workspace when a user removes just the folder.
+    await prisma.$transaction([
+      prisma.video.updateMany({
+        where: { folderId },
+        data: { folderId: null },
+      }),
+      prisma.folder.delete({
+        where: { id: folderId },
+      }),
+    ]);
+
+    return { status: 200, data: "Folder deleted. Its videos were kept." };
+  } catch (error) {
+    console.error("Error deleting folder:", error);
+    return { status: 500, data: "Unable to delete this folder." };
+  }
+};
+
+export const renameVideo = async (videoId: string, title: string) => {
+  try {
+    await prisma.video.update({
+      where: { id: videoId },
+      data: { title },
+    });
+
+    return { status: 200, data: "Video renamed." };
+  } catch (error) {
+    console.error("Error renaming video:", error);
+    return { status: 500, data: "Unable to rename this video." };
+  }
+};
+
+export const deleteVideo = async (videoId: string) => {
+  try {
+    await prisma.video.delete({
+      where: { id: videoId },
+    });
+
+    return { status: 200, data: "Video deleted." };
+  } catch (error) {
+    console.error("Error deleting video:", error);
+    return { status: 500, data: "Unable to delete this video." };
+  }
+};
+
 export const createFolder = async (workspaceId: string) => {
   try {
     await prisma.workspace.update({
@@ -369,6 +430,7 @@ export const getPreviewVideo = async (videoId: string) => {
         processing: true,
         views: true,
         summery: true,
+        videoUrl:true,
         User: {
           select: {
             firstname: true,

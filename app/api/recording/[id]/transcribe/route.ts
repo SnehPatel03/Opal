@@ -5,14 +5,33 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-export async function POST(req: NextRequest, { params }: Props) {
+export async function POST(
+  req: NextRequest,
+  { params }: Props,
+) {
   try {
-    const { id } = await params;
+    const { id: mediaId } = await params;
     const body = await req.json();
+
+    if (
+      !body.filename ||
+      !body.transcript ||
+      !body.title ||
+      !body.summary
+    ) {
+      return NextResponse.json(
+        {
+          status: 400,
+          message:
+            "Filename, transcript, title and summary are required",
+        },
+        { status: 400 },
+      );
+    }
 
     const media = await prisma.media.findUnique({
       where: {
-        id,
+        id: mediaId,
       },
       select: {
         userId: true,
@@ -29,8 +48,9 @@ export async function POST(req: NextRequest, { params }: Props) {
       );
     }
 
-    const transcrib = await prisma.video.update({
+    const transcribe = await prisma.video.update({
       where: {
+        userId: media.userId,
         source: body.filename,
       },
       data: {
@@ -42,19 +62,19 @@ export async function POST(req: NextRequest, { params }: Props) {
 
     return NextResponse.json({
       status: 200,
-      message: "Transcript generated",
-      data: transcrib,
+      data: transcribe,
     });
   } catch (error) {
     console.error(
-      "Error in transcribe Endpoint:",
+      "Error in Transcribe Endpoint:",
       error,
     );
 
     return NextResponse.json(
       {
         status: 500,
-        message: "Failed to generate transcript",
+        message:
+          "Failed to save transcript and summary",
       },
       { status: 500 },
     );

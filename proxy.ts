@@ -1,16 +1,9 @@
-  import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from "@clerk/nextjs/server";
 
-  const isProtectedRoute = createRouteMatcher([
-    "/dashboard(.*)",
-    "/api/payment(.*)",
-    // "/payment(.*)",
-  ]);
-
-  export default clerkMiddleware(async (auth, req) => {
-    if (isProtectedRoute(req)) {
-      await auth.protect();
-    }
-  });
+  // Keep middleware non-redirecting. Protected pages and API routes perform
+  // their own resource-level checks, which avoids redirect exceptions during
+  // preview navigation while preserving authentication enforcement.
+  export default clerkMiddleware();
 
   export const config = {
     matcher: [

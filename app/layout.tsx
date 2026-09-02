@@ -15,6 +15,9 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "Opal",
   description: "Share AI Powered videos with your friends",
+  icons: {
+    icon: "/logo.svg",
+  },
 };
 
 export default function RootLayout({

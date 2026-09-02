@@ -1,57 +1,124 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
+
+const NAV_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/contact", label: "Contact" },
+];
 
 const LandingPageNavbar = () => {
-  return (
-    <header className="w-full border-b border-neutral-800 bg-[#111111]">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <button className="text-neutral-200">
-            <Menu size={24} />
-          </button>
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo.svg"
-              alt="Logo"
-              width={42}
-              height={42}
-              priority
-            />
-            <span className="text-3xl font-semibold text-neutral-200">Opal</span>
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 sm:pt-6">
+      <div
+        className={[
+          "relative w-full max-w-5xl overflow-hidden rounded-2xl border transition-all duration-300 ease-out",
+          "backdrop-blur-2xl",
+          scrolled
+            ? "border-white/10 bg-black/75 shadow-[0_10px_40px_rgba(0,0,0,0.55)]"
+            : "border-white/[0.08] bg-black/40 shadow-[0_8px_30px_rgba(0,0,0,0.35)]",
+        ].join(" ")}
+      >
+        {/* mirror / glass sheen */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -top-16 left-1/2 h-32 w-[140%] -translate-x-1/2 rounded-full bg-white/[0.06] blur-2xl"
+          aria-hidden
+        />
+
+        <div className="relative flex h-14 items-center justify-between px-4 sm:h-16 sm:px-5">
+          {/* Logo / mark */}
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image src="/logo.svg" alt="" width={47} height={20} priority />
+
           </Link>
+
+          {/* Center nav links */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-3 py-1.5 text-[13.5px] font-medium text-white/60 transition-colors duration-150 hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/auth/sign-in"
+              className="hidden px-2 text-[13.5px] font-medium text-white/60 transition-colors duration-150 hover:text-white sm:block"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/auth/sign-up"
+              className="group flex items-center gap-1.5 rounded-full bg-[#FF4D1C] py-2 pl-4 pr-3 text-[13px] font-semibold text-white shadow-[0_0_0_1px_rgba(255,77,28,0.4),0_6px_20px_rgba(255,77,28,0.25)] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+            >
+              Get Started
+              <ArrowUpRight
+                size={14}
+                className="transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </Link>
+
+            {/* Mobile toggle */}
+            <button
+              onClick={() => setMobileOpen((v) => !v)}
+              className="ml-1 flex h-9 w-9 items-center justify-center rounded-lg text-white/60 transition-colors hover:text-white md:hidden"
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
 
-        <nav className="hidden items-center gap-4 md:flex">
-          <Link
-            href="/"
-            className="rounded-full bg-violet-600 px-7 py-3 text-sm font-medium text-neutral-200 transition hover:bg-violet-700"
-          >
-            Home
-          </Link>
-          <Link
-            href="/pricing"
-            className="text-sm text-neutral-300 transition hover:text-neutral-200"
-          >
-            Pricing
-          </Link>
-
-          <Link
-            href="/contact"
-            className="text-sm text-neutral-300 transition hover:text-neutral-200"
-          >
-            Contact
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-8">
-          <Link
-            href="/auth/sign-in"
-            className="rounded-xl bg-neutral-200 px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200"
-          >
-            Login
-          </Link>
+        {/* Mobile drawer */}
+        <div
+          className={[
+            "relative overflow-hidden transition-all duration-300 ease-out md:hidden",
+            mobileOpen ? "max-h-60 border-t border-white/[0.08]" : "max-h-0",
+          ].join(" ")}
+        >
+          <nav className="flex flex-col gap-1 p-3">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/auth/sign-in"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white"
+            >
+              Log in
+            </Link>
+          </nav>
         </div>
       </div>
     </header>

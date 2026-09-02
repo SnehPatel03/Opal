@@ -59,7 +59,13 @@ const Videos = ({ folderId , workspaceId , videoKey, limit }: Props) => {
       >
         {VideoStatus == 200 ? (
           videos.slice(0, limit).map((video) =>
-            <VideoCard key={video.id} workspaceId={workspaceId} videoQueryKey={videoKey} {...video}/>
+            <VideoCard 
+              key={video.id} 
+              workspaceId={workspaceId} 
+              videoQueryKey={videoKey} 
+              videoUrl={video.source}
+              {...video}
+            />
         )
         ) : (
           <p>No Videos In Workspace</p>

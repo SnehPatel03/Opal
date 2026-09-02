@@ -19,12 +19,6 @@ const ChangeVideoLocation = ({
   const { register, onFormSubmit, workspaces, isFolders, isPending } =
     useMoveVideos(videoId, currentWorkspace);
 
-  console.log("=========== MOVE VIDEO DEBUG ===========");
-  console.log("Current Workspace ID :", currentWorkspace);
-  console.log("Current Folder ID :", currentFolder);
-  console.log("User Workspaces :", workspaces);
-  console.log("Fetched Folders :", isFolders);
-  console.log("========================================");
 
   const workspace = workspaces.find((item) => item.id === currentWorkspace);
 

@@ -32,16 +32,10 @@ const VideoPriview = ({ videoId }: Props) => {
     },
   );
 
-  if (!data) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-black text-zinc-400">
-        Loading video...
-      </div>
-    );
-  }
-
-  const { data: video, status, relativeDate } =
-    data as VideoProps;
+  const videoData = data as VideoProps | undefined;
+  const video = videoData?.data;
+  const status = videoData?.status;
+  const relativeDate = videoData?.relativeDate;
 
   useEffect(() => {
     if (data && status !== 200) {
@@ -50,14 +44,19 @@ const VideoPriview = ({ videoId }: Props) => {
   }, [data, status, router]);
 
   useEffect(() => {
-    if (
-      !hasNotifiedFirstView.current &&
-      video?.views === 0
-    ) {
+    if (!hasNotifiedFirstView.current && video?.views === 0) {
       hasNotifiedFirstView.current = true;
       void sendEmailForFirstView(videoId);
     }
   }, [video?.views, videoId]);
+
+  if (!data || !video) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
+        Loading video...
+      </div>
+    );
+  }
 
   // Use the actual ImageKit URL saved in the database.
   // Do NOT construct the URL from video.source.
@@ -68,8 +67,9 @@ const VideoPriview = ({ videoId }: Props) => {
     /^https?:\/\//i.test(videoSource);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
-      <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="h-[calc(100dvh-5rem)] overflow-hidden bg-background">
+      <div className="mx-auto flex h-full w-full max-w-[1600px] flex-col px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mb-4 flex shrink-0 flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Video library
@@ -112,8 +112,9 @@ const VideoPriview = ({ videoId }: Props) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="min-w-0 space-y-6">
+      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="grid h-full min-h-0 grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-h-0 min-w-0 space-y-4 overflow-y-auto pr-1">
           <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-[#171717] shadow-2xl shadow-black/20">
             {hasPlayableSource ? (
               <video
@@ -162,7 +163,7 @@ const VideoPriview = ({ videoId }: Props) => {
           </div>
         </div>
 
-        <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
+        <aside className="min-h-0 space-y-4 overflow-y-auto pr-1">
           <div className="rounded-2xl border border-zinc-800 bg-[#171717] p-6">
             <h3 className="mb-5 text-lg font-semibold text-white">
               Share
@@ -227,6 +228,8 @@ const VideoPriview = ({ videoId }: Props) => {
             </TabsComponent>
           </div>
         </aside>
+      </div>
+      </div>
       </div>
     </div>
   );

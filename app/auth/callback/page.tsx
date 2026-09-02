@@ -4,13 +4,13 @@ const AuthCallbackPage = async () => {
   const auth = await onAuthenticatedUser();
 
   if (auth.status === 200 || auth.status === 201) {
-    const workspaceId = auth.data?.workspace.at(0)?.id;
+    const workspaceId = auth.data?.workspace?.[0]?.id;
 
     if (workspaceId) {
-      redirect(`/dashboard/${workspaceId}`);
+      return redirect(`/dashboard/${workspaceId}`);
     }
   }
 
-  redirect("/auth/sign-in");
+  return redirect("/auth/sign-in");
 };
 export default AuthCallbackPage;

@@ -11,8 +11,7 @@ const page = async ({ searchParams }: Props) => {
   if (session_id) {
     const customer = await completeSubscription(session_id);
     if (customer?.status === 200) {
-      // return redirect(`/dashboard/${customer.workspaceId}`);
-      return redirect ('/auth/sign-in') //Juagd
+      return redirect(`/dashboard/${customer.workspaceId}`);
     }
   }
 

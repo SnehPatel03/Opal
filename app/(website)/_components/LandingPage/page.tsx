@@ -1,7 +1,6 @@
 "use client";
-
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ArrowUpRight,
   Mic,
@@ -18,9 +17,7 @@ import {
 import LandingPageNavbar from "../navbar";
 
 const BRAND_ORANGE = "#FF4C0F";
-
 const AVATAR_COLORS = ["#FFB4A2", "#A2D2FF", "#B9FBC0", "#FFD6A5"];
-
 const STEPS = [
   { label: "Start recording your\nscreen, cam & mic" },
   { label: "Organize into a\nworkspace or folder" },
@@ -81,13 +78,90 @@ const RecordingControlBar = () => {
   );
 };
 
+/** Animated dot-matrix audio waveform using Canvas */
+const WaveformCanvas = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas:any = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animationFrameId:any;
+    let time = 0;
+
+    const resizeCanvas = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    };
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const draw = () => {
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      ctx.clearRect(0, 0, width, height);
+
+      const dotSize = 3;
+      const stepX = 12;
+      const stepY = 12;
+
+      const cols = Math.floor(width / stepX);
+      const rows = Math.floor(height / stepY);
+
+      const offsetX = (width - cols * stepX) / 2 + stepX / 2;
+      const offsetY = (height - rows * stepY) / 2 + stepY / 2;
+
+      for (let i = 0; i < cols; i++) {
+        // Generate an organic wave amplitude
+        const baseAmp = (height / 2.5) * (0.6 + Math.sin(time * 0.5 + i * 0.15) * 0.4);
+        const amp = baseAmp * (0.5 + Math.sin(time + i * 0.4) * 0.5);
+        const centerY = height / 2;
+
+        for (let j = 0; j < rows; j++) {
+          const y = offsetY + j * stepY;
+          const distFromCenter = Math.abs(y - centerY);
+
+          if (distFromCenter < amp) {
+            // Calculate opacity based on distance from the wave edge
+            const edgeDist = amp - distFromCenter;
+            const opacity = Math.min(1, edgeDist / 20);
+            
+            if (opacity > 0.05) {
+              ctx.beginPath();
+              ctx.arc(offsetX + i * stepX, y, dotSize, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(255, 76, 15, ${opacity})`;
+              ctx.fill();
+            }
+          }
+        }
+      }
+
+      time += 0.05;
+      animationFrameId = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="h-full w-full block" />;
+};
+
 const LandingPage = () => {
   return (
     <>
       <LandingPageNavbar />
 
       <section className="relative overflow-hidden bg-black pb-24 pt-40 sm:pt-48">
-
+        {/* Ambient background glows */}
         <div
           className="pointer-events-none absolute -top-40 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
           style={{ background: BRAND_ORANGE }}
@@ -99,11 +173,9 @@ const LandingPage = () => {
           aria-hidden
         />
 
-    
-
         <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-16 px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
-
-          <div>
+          {/* Left Column: Content */}
+          <div className="flex flex-col justify-center">
             <h1 className="text-[13vw] font-black uppercase leading-[0.92] tracking-tight text-white sm:text-[60px] lg:text-[64px]">
               Screen Record.
               <br />
@@ -135,6 +207,7 @@ const LandingPage = () => {
                 <ArrowUpRight size={20} />
               </Link>
             </div>
+
             <ol className="mt-14 grid max-w-md grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-3">
               {STEPS.map((step, i) => (
                 <li key={i} className="border-t border-white/15 pt-3">
@@ -152,13 +225,56 @@ const LandingPage = () => {
             </ol>
           </div>
 
-          {/* Right column — live recording window mockup */}
+          {/* Right Column: Interactive UI Element */}
           <div className="flex items-center justify-center lg:justify-end">
+            <div className="relative w-full max-w-[440px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] p-1.5 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+              
+              {/* Browser/App Top Bar */}
+              <div className="flex items-center gap-2 border-b border-white/5 px-4 py-2.5">
+                <div className="flex gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
+                </div>
+                <div className="ml-2 flex-1 truncate rounded-md bg-white/5 px-3 py-1 text-center text-[11px] font-medium text-white/40">
+                  app.opal.com/workspace/recording-01
+                </div>
+              </div>
 
+              {/* Main Visual Area */}
+              <div className="relative h-[280px] w-full overflow-hidden rounded-xl bg-black/40">
+                {/* Dot-matrix Waveform Animation */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <WaveformCanvas />
+                </div>
+
+                {/* Overlay: Active camera bubble */}
+                <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 py-1 pl-1 pr-3 backdrop-blur-xl">
+                  <div 
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-black" 
+                    style={{ background: AVATAR_COLORS[0] }}
+                  >
+                    JD
+                  </div>
+                  <span className="text-[11px] font-medium text-white/80">Jordan Doe</span>
+                </div>
+
+                {/* Overlay: AI Transcribing badge */}
+                <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-2.5 py-1 backdrop-blur-xl">
+                  <Sparkles size={12} style={{ color: BRAND_ORANGE }} />
+                  <span className="text-[10px] font-medium text-white/70">AI Transcribing...</span>
+                </div>
+              </div>
+
+              {/* Recording Control Bar Footer */}
+              <div className="flex justify-center py-4">
+                <RecordingControlBar />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* bottom strip echoing Opal's real feature set */}
+        {/* Feature List Footer */}
         <div className="relative mx-auto mt-20 flex max-w-6xl flex-wrap items-center justify-center gap-x-10 gap-y-4 border-t border-white/10 px-6 pt-8 text-white/35">
           <div className="flex items-center gap-2 text-[12px] font-medium">
             <MessageSquare size={14} />

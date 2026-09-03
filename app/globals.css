@@ -55,7 +55,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.64 0.21 34);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -81,6 +81,51 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+::selection { background: #ff4c0f; color: white; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #0b0b0c;
+  text-rendering: optimizeLegibility;
+}
+
+.opal-atmosphere {
+  background-color: #0b0b0c;
+  background-image:
+    radial-gradient(ellipse 52% 48% at 2% 76%, rgba(255, 76, 15, .16), transparent 68%),
+    radial-gradient(ellipse 34% 30% at 90% 6%, rgba(255, 76, 15, .045), transparent 72%),
+    radial-gradient(circle at 1px 1px, rgba(255, 76, 15, .19) 1px, transparent 1.35px);
+  background-size: auto, auto, 34px 34px;
+  background-position: center, center, 0 0;
+}
+
+.opal-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 76, 15, .12) 1px, transparent 1.25px);
+  background-size: 34px 34px;
+}
+
+.opal-display {
+  font-weight: 450;
+  letter-spacing: -.065em;
+  line-height: .9;
+}
+
+.opal-panel {
+  border: 1px solid rgba(255,255,255,.12);
+  background: linear-gradient(135deg, rgba(255,255,255,.105) 0%, rgba(255,255,255,.045) 35%, rgba(10,10,12,.54) 100%);
+  box-shadow: inset 0 1px rgba(255,255,255,.14), inset 0 -1px rgba(0,0,0,.2), 0 20px 60px rgba(0,0,0,.25);
+  backdrop-filter: blur(24px) saturate(135%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+}
+
+.opal-sidebar {
+  background: linear-gradient(180deg, rgba(22,22,24,.9), rgba(9,9,10,.84));
+  box-shadow: inset -1px 0 rgba(255,255,255,.045), 18px 0 45px rgba(0,0,0,.12);
+  backdrop-filter: blur(30px) saturate(130%);
+  -webkit-backdrop-filter: blur(30px) saturate(130%);
 }
 
 .dark {

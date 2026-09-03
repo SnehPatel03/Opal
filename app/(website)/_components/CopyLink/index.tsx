@@ -35,19 +35,19 @@ const CopyLink = ({ videoId, className, variant = "ghost" }: Props) => {
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
       onClick={onCopyClipboard}
       className="
     h-9 w-9 rounded-xl
-    border border-zinc-700
-    bg-black/60 p-0
+    border border-white/[.12]
+    bg-white/[.04] p-0
     backdrop-blur-md
     transition-all duration-200
-    hover:border-white/40
-    hover:bg-black/80
+    hover:border-[#ff4c0f]
+    hover:bg-[#ff4c0f]
   "
     >
-      <Link size={17} className="text-zinc-300" />
+      <Link size={17} className="text-white/70" />
     </Button>
   );
 };

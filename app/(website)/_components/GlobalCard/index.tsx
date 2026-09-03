@@ -21,12 +21,12 @@ const GlobalCard = ({
   return (
     <div
       className={cn(
-        "rounded-xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-sm",
+        "rounded-2xl border border-white/[0.09] bg-gradient-to-br from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_rgba(255,255,255,.06)] backdrop-blur-sm",
         className
       )}
     >
       <div className="space-y-1 p-4">
-        <h3 className="text-sm font-semibold text-neutral-200">{title}</h3>
+        <h3 className="text-sm font-bold text-white">{title}</h3>
 
         {description && (
           <p className="text-xs leading-relaxed text-zinc-400">
@@ -36,13 +36,13 @@ const GlobalCard = ({
       </div>
 
       {children && (
-        <div className="border-t border-zinc-800 px-4 py-4">
+        <div className="border-t border-white/[0.08] px-4 py-4">
           {children}
         </div>
       )}
 
       {footer && (
-        <div className="border-t border-zinc-800 bg-zinc-900/60 px-4 py-3">
+        <div className="border-t border-white/[0.08] bg-black/10 px-4 py-3">
           {footer}
         </div>
       )}

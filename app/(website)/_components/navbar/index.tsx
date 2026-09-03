@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
+  { href: "/services", label: "Services" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/contact", label: "Contact" },
+  { href: "/#how-it-works", label: "How it works" },
 ];
 
 const LandingPageNavbar = () => {
@@ -45,7 +45,7 @@ const LandingPageNavbar = () => {
 
         <div className="relative flex h-14 items-center justify-between px-4 sm:h-16 sm:px-5">
           {/* Logo / mark */}
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5" aria-label="Opal home">
             <Image src="/logo.svg" alt="" width={47} height={20} priority />
 
           </Link>

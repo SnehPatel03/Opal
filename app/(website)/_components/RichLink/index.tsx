@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Code2 } from "lucide-react";
 import { toast } from "sonner";
 import React from "react";
 
@@ -84,8 +85,8 @@ const RichLink = ({ title, description, source, id }: Props) => {
   };
 
   return (
-    <Button onClick={copyLink}>
-      Get Embedded Code
+    <Button onClick={copyLink} className="h-9 rounded-xl border border-white/[.12] bg-white/[.06] px-3 text-xs font-semibold text-white hover:border-[#ff4c0f] hover:bg-[#ff4c0f] hover:text-black">
+      <Code2 size={14} className="mr-1.5" /> Embed
     </Button>
   );
 };

@@ -112,8 +112,8 @@ const VideoCard = ({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-zinc-800 bg-[#171717]",
-        "transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900",
+        "group relative overflow-hidden rounded-2xl border border-white/[0.09] bg-white/[0.035]",
+        "transition-all duration-300 hover:-translate-y-1 hover:border-[#ff4c0f]/60 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-black/30",
       )}
     >
       <div className="absolute right-3 top-3 z-30 flex items-center gap-2 opacity-0 transition-all duration-200 group-hover:opacity-100 focus-within:opacity-100">
@@ -156,7 +156,7 @@ const VideoCard = ({
 
       <Link
         href={`/dashboard/${workspaceId}/video/${id}`}
-        className="flex h-full flex-col transition duration-200 hover:bg-[#202020]"
+        className="flex h-full flex-col transition duration-200"
       >
         <div className="relative aspect-video overflow-hidden bg-black">
           {videoSource ? (
@@ -179,7 +179,7 @@ const VideoCard = ({
 
           <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
 
-          <div className="pointer-events-none absolute left-4 top-4 rounded-lg bg-black/70 px-2 py-1 text-xs font-medium text-white backdrop-blur">
+          <div className={`pointer-events-none absolute left-4 top-4 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide backdrop-blur ${processing ? "border-amber-400/30 bg-amber-400/10 text-amber-200" : "border-[#ff4c0f]/40 bg-[#ff4c0f]/15 text-[#ff956f]"}`}>
             {processing ? "Processing..." : "Ready"}
           </div>
         </div>

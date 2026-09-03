@@ -7,6 +7,7 @@ import { VideosProps } from "@/types/index.type";
 import { VideoIcon } from "lucide-react";
 import React from "react";
 import VideoCard from "./video-card.tsx";
+import LoadingComponent from "../loadingComponent";
 
 type Props = {
   folderId: string;
@@ -22,17 +23,7 @@ const Videos = ({ folderId , workspaceId , videoKey, limit }: Props) => {
 
   if (isPending || !videoData) {
     return (
-      <div className="mt-4 flex flex-col gap-4">
-        <div className="h-7 w-32 animate-pulse rounded-md bg-zinc-800" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div
-              key={index}
-              className="aspect-video animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900/60"
-            />
-          ))}
-        </div>
-      </div>
+      <div className="flex min-h-80 items-center justify-center"><LoadingComponent /></div>
     );
   }
 

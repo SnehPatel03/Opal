@@ -18,8 +18,8 @@ const TabsComponent = ({
         className="
           h-11 w-full justify-start
           rounded-xl
-          border border-zinc-800
-          bg-[#1a1a1a]
+          border border-white/[.09]
+          bg-black/30
           p-1
         "
       >
@@ -33,17 +33,17 @@ const TabsComponent = ({
               py-2
               text-sm
               font-medium
-              text-zinc-400
+              text-white/45
               transition-all
               duration-200
 
               hover:text-white
 
-              data-[state=active]:bg-zinc-800
-              data-[state=active]:text-white
+              data-[state=active]:bg-[#ff4c0f]
+              data-[state=active]:text-black
               data-[state=active]:shadow-sm
               data-[state=active]:border
-              data-[state=active]:border-zinc-700
+              data-[state=active]:border-[#ff4c0f]
             "
           >
             {trigger}

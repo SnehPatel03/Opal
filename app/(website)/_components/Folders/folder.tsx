@@ -18,7 +18,6 @@ type Props = {
 const Folder = ({ id, name, count, optimistic }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
-console.log("count",count)
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [onRename, setOnRename] = useState(false);
@@ -71,8 +70,8 @@ console.log("count",count)
     <div
       onClick={handleFolderClick}
       className={cn(
-        "group relative flex min-w-55 cursor-pointer flex-col gap-3 rounded-2xl border border-zinc-800 bg-[#171717] p-4 transition-all duration-200",
-        "hover:border-zinc-700 hover:bg-zinc-900 hover:shadow-xl hover:shadow-black/20",
+        "group relative flex min-w-55 cursor-pointer flex-col gap-3 rounded-2xl border border-white/[0.09] bg-white/[0.035] p-4 transition-all duration-300",
+        "hover:border-[#ff4c0f]/60 hover:bg-white/[0.07] hover:shadow-xl hover:shadow-black/20",
         optimistic && "animate-pulse opacity-60"
       )}
     >
@@ -86,8 +85,8 @@ console.log("count",count)
         <Trash2 className="h-4 w-4" />
       </button>
 
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-800 transition-colors group-hover:bg-zinc-700">
-        <FolderIcon className="h-5.5 w-5.5 text-zinc-300" />
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff4c0f]/15 transition-colors group-hover:bg-[#ff4c0f]">
+        <FolderIcon className="h-5.5 w-5.5 text-[#ff784c] transition-colors group-hover:text-black" />
       </div>
 
       <div className="space-y-0.5">

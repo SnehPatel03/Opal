@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { PlusCircle, X } from "lucide-react";
+import { PlusCircle, Trash2, X } from "lucide-react";
 
 import {
   Select,
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getNotifications } from "@/actions/user";
-import { getWorkspaces } from "@/actions/workspace";
+import { deleteWorkspace, getWorkspaces } from "@/actions/workspace";
 import { MENU_ITEMS } from "@/constants";
 import { userQueryData } from "@/hooks/userQueryData";
 import { NotifactionProps, WorkspaceProps } from "@/types/index.type";
@@ -27,6 +27,7 @@ import GlobalCard from "../GlobalCard";
 import { useDispatch } from "react-redux";
 import { WORKSPACES } from "@/redux/slices/workspaces";
 import PaymentButton from "../Payment-Button";
+import { useMutationData } from "@/hooks/useMutationData";
 
 type Props = {
   activeWorkspaceId: string;
@@ -83,6 +84,18 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const currentWorkspace = workspace?.workspace.find(
     (workspace) => workspace.id === activeWorkspaceId,
   );
+  const { mutate: removeWorkspace, isPending: isDeletingWorkspace } = useMutationData(
+    ["delete-workspace"],
+    () => deleteWorkspace(activeWorkspaceId),
+    "user-workspaces",
+    () => router.push(`/dashboard/${workspace?.workspace.find((item) => item.type === "PERSONAL")?.id ?? ""}`),
+  );
+
+  const handleDeleteWorkspace = () => {
+    if (window.confirm(`Delete “${currentWorkspace?.name}”? Its folders, videos, and workspace members will be removed.`)) {
+      removeWorkspace({});
+    }
+  };
 
   useEffect(() => {
     if (isFetched && workspace) {
@@ -105,8 +118,8 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   ];
 
   const sidebarContent = (
-    <aside className="flex h-screen w-64 flex-col overflow-hidden border-r border-zinc-800 bg-[#111111] text-neutral-200">
-      <div className="flex items-center justify-center gap-2 border-b border-zinc-800 py-3 px-4">
+    <aside className="opal-sidebar flex h-screen w-68 flex-col overflow-hidden border-r border-white/[0.08] text-neutral-200">
+      <div className="flex items-center justify-center gap-2 border-b border-white/[0.08] py-5 px-4">
         <Image
           src="/logo.svg"
           alt="Opal Logo"
@@ -114,7 +127,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
           height={32}
           priority
         />
-        <h1 className="text-2xl font-semibold">Opal</h1>
+        <h1 className="text-2xl font-black tracking-[-.06em]">Opal</h1>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
@@ -122,7 +135,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
           value={selectedWorkspaceId}
           onValueChange={onChangeActiveWorkspace}
         >
-          <SelectTrigger className="w-full border-zinc-700 bg-zinc-900 text-sm">
+          <SelectTrigger className="w-full rounded-xl border-white/[.1] bg-white/[.055] text-sm shadow-[inset_0_1px_rgba(255,255,255,.06)] hover:bg-white/[.08]">
             <SelectValue placeholder="Select Workspace">
               {mounted
                 ? selectedWorkspaceName || "Select Workspace"
@@ -130,7 +143,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             </SelectValue>
           </SelectTrigger>
 
-          <SelectContent className="border-zinc-800 bg-[#111111] text-neutral-200">
+          <SelectContent className="border-white/[.1] bg-[#161618]/95 text-neutral-200 backdrop-blur-2xl">
             <SelectGroup>
               <SelectLabel>Workspaces</SelectLabel>
               {isFetched &&
@@ -209,7 +222,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
         {mounted && (
           <>
-            <div className="flex items-center justify-between border-b border-zinc-800/60 px-3 py-2 mt-6">
+            <div className="flex items-center justify-between border-b border-white/[.08] px-3 py-2 mt-6">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
                   Workspaces
@@ -217,7 +230,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
               </div>
             </div>
             {listedWorkspaces.length > 0 ? (
-              <div className="relative mt-2 overflow-hidden rounded-lg border border-zinc-800/60 bg-[#151515]/80 backdrop-blur-xl">
+              <div className="relative mt-2 overflow-hidden rounded-xl border border-white/[.08] bg-white/[.035] backdrop-blur-xl">
                 <div className="pointer-events-none absolute top-0 left-0 z-20 h-8 w-full bg-linear-to-b from-[#151515] via-[#151515]/90 to-transparent" />
                 <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-8 w-full bg-linear-to-t from-[#151515] via-[#151515]/90 to-transparent" />
                 <div className="no-scrollbar max-h-40 space-y-0.5 overflow-y-auto p-2 py-2 scroll-smooth">
@@ -237,11 +250,17 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 </div>
               </div>
             ) : (
-              <div className="mt-2 rounded-lg border border-dashed border-zinc-800 py-6 text-center">
+              <div className="mt-2 rounded-xl border border-dashed border-white/[.1] bg-black/10 py-6 text-center">
                 <p className="text-xs text-zinc-400">No Workspaces</p>
               </div>
             )}
           </>
+        )}
+
+        {mounted && currentWorkspace?.type === "PUBLIC" && (
+          <button type="button" onClick={handleDeleteWorkspace} disabled={isDeletingWorkspace} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-white/[.08] bg-white/[.025] px-3 py-2 text-xs font-medium text-white/40 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-200 disabled:opacity-50">
+            <Trash2 size={14} /> {isDeletingWorkspace ? "Deleting workspace…" : "Delete workspace"}
+          </button>
         )}
 
         {mounted && workspace?.subscription?.plan === "FREE" && (

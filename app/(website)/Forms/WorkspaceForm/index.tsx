@@ -3,10 +3,10 @@ import React from "react";
 import FormGenerator from "../FormGenerator";
 import { Button } from "@/components/ui/button";
 
-type Props = {};
+type Props = { onSuccess?: () => void };
 
-const WorkspaceForm = (props: Props) => {
-  const { errors, register, isPending, onFormSubmit } = useCreateWorkspace();
+const WorkspaceForm = ({ onSuccess }: Props) => {
+  const { errors, register, isPending, onFormSubmit } = useCreateWorkspace(onSuccess);
   return (
     <form onSubmit={onFormSubmit} className="flex flex-col gap-y-3 ">
       <FormGenerator
@@ -19,7 +19,7 @@ const WorkspaceForm = (props: Props) => {
         errors={errors}
       />
       <Button
-        className="text-sm w-full mt-2"
+        className="mt-2 w-full rounded-xl bg-[#ff4c0f] text-sm font-bold text-black hover:bg-[#ff6840]"
         disabled={isPending}
         type="submit"
       >

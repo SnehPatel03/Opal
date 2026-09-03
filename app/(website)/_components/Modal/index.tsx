@@ -14,6 +14,8 @@ type Props = {
   title: string;
   description: string;
   className?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export const Modal = ({
@@ -22,16 +24,18 @@ export const Modal = ({
   title,
   description,
   className,
+  open,
+  onOpenChange,
 }: Props) => {
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger  className={className}>
         {trigger}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="border border-white/[.14] bg-[#151518]/82 p-6 text-white shadow-[0_24px_90px_rgba(0,0,0,.6)] backdrop-blur-3xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle className="text-xl font-black tracking-[-.04em]">{title}</DialogTitle>
+          <DialogDescription className="text-white/45">{description}</DialogDescription>
         </DialogHeader>
 
         {children}
@@ -39,4 +43,3 @@ export const Modal = ({
     </Dialog>
   );
 };
-

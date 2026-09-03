@@ -24,7 +24,7 @@ const CommentForm = ({
   return (
     <form onSubmit={onFormSubmit} className="w-full">
       <div className="flex gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-sm font-medium text-white">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[.12] bg-gradient-to-br from-white/[.16] to-white/[.04] text-sm font-medium text-white shadow-[inset_0_1px_rgba(255,255,255,.14)]">
           {author.charAt(0).toUpperCase()}
         </div>
 
@@ -49,7 +49,7 @@ const CommentForm = ({
                 variant="ghost"
                 size="sm"
                 onClick={close}
-                className="text-zinc-400 hover:text-white"
+                className="text-white/45 hover:bg-white/[.07] hover:text-white"
               >
                 Cancel
               </Button>
@@ -59,7 +59,7 @@ const CommentForm = ({
               type="submit"
               size="sm"
               disabled={isPending}
-              className="gap-2 rounded-full px-4"
+              className="gap-2 rounded-full bg-[#ff4c0f] px-4 font-semibold text-black hover:bg-[#ff6840]"
             >
               <Send className="h-3.5 w-3.5" />
 

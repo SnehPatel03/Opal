@@ -46,14 +46,14 @@ const SettingsPage = () => {
   };
 
   return (
-<div className="mx-auto max-w-3xl p-8">
-  <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-[#171717]">
-    <div className="border-b border-zinc-800 px-6 py-5">
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+<div className="mx-auto max-w-3xl py-3 sm:p-8">
+  <div className="opal-panel overflow-hidden rounded-3xl">
+    <div className="border-b border-white/[.08] px-6 py-6">
+      <p className="font-mono text-[10px] font-bold uppercase tracking-[.22em] text-[#ff784c]">
         PERSONAL
       </p>
 
-      <h1 className="mt-1 text-2xl font-bold text-white">
+      <h1 className="mt-2 text-3xl font-black uppercase tracking-[-.055em] text-white">
         Video Sharing Settings
       </h1>
 
@@ -64,8 +64,8 @@ const SettingsPage = () => {
 
     <div className="flex items-center justify-between px-6 py-6">
       <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900">
-          <Eye className="h-5 w-5 text-zinc-300" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#ff4c0f]/15">
+          <Eye className="h-5 w-5 text-[#ff784c]" />
         </div>
 
         <div className="max-w-lg">

@@ -266,6 +266,31 @@ export const CreateWorkspaces = async (name: string) => {
   }
 };
 
+export const deleteWorkspace = async (workspaceId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) return { status: 401, data: "Please sign in to continue." };
+
+    const workspace = await prisma.workspace.findFirst({
+      where: { id: workspaceId, type: "PUBLIC", User: { clerkid: user.id } },
+      select: { id: true },
+    });
+    if (!workspace) return { status: 403, data: "Only workspaces you own can be deleted." };
+
+    await prisma.$transaction([
+      prisma.video.deleteMany({ where: { workspaceId } }),
+      prisma.folder.deleteMany({ where: { workspaceId } }),
+      prisma.member.deleteMany({ where: { workspaceId } }),
+      prisma.invite.deleteMany({ where: { workspaceId } }),
+      prisma.workspace.delete({ where: { id: workspaceId } }),
+    ]);
+    return { status: 200, data: "Workspace deleted." };
+  } catch (error) {
+    console.error("Error deleting workspace:", error);
+    return { status: 500, data: "Unable to delete this workspace." };
+  }
+};
+
 export const renameFolder = async (folderId: string, name: string) => {
   try {
     const folder = await prisma.folder.update({

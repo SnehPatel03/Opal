@@ -80,13 +80,14 @@ const RecordingControlBar = () => {
 
 /** Animated dot-matrix audio waveform using Canvas */
 const WaveformCanvas = () => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas:any = canvasRef.current;
+    const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let animationFrameId:any;
+    if (!ctx) return;
+    let animationFrameId: number;
     let time = 0;
 
     const resizeCanvas = () => {
@@ -160,7 +161,7 @@ const LandingPage = () => {
     <>
       <LandingPageNavbar />
 
-      <section className="relative overflow-hidden bg-black pb-24 pt-40 sm:pt-48">
+      <section className="opal-atmosphere relative overflow-hidden pb-24 pt-40 sm:pt-48">
         {/* Ambient background glows */}
         <div
           className="pointer-events-none absolute -top-40 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
@@ -176,16 +177,14 @@ const LandingPage = () => {
         <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-16 px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
           {/* Left Column: Content */}
           <div className="flex flex-col justify-center">
-            <h1 className="text-[13vw] font-black uppercase leading-[0.92] tracking-tight text-white sm:text-[60px] lg:text-[64px]">
-              Screen Record.
-              <br />
-              Share Instantly.
+            <p className="mb-5 font-mono text-[10px] font-bold uppercase tracking-[.28em] text-[#ff4c0f]">The visual feedback studio</p>
+            <h1 className="opal-display text-[13vw] uppercase text-white sm:text-[60px] lg:text-[68px]">
+              Make work<br />
+              <span className="text-[#ff4c0f]">visible.</span>
             </h1>
 
             <p className="mt-6 max-w-md text-[15px] leading-relaxed text-white/55">
-              Capture your screen, camera and mic in one click. Opal turns
-              every recording into a shareable video with an AI summary,
-              transcript and space for your team to comment.
+              Record the work behind the work. Opal turns every screen capture into a clear, shareable conversation with AI context built in.
             </p>
 
             <div className="mt-8 flex items-center gap-3">
@@ -290,6 +289,24 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      <section id="how-it-works" className="relative overflow-hidden bg-[#f3f1ed] px-6 py-24 text-[#121212] sm:py-32">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 border-b border-black/15 pb-12 lg:grid-cols-[.8fr_1.2fr]">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[.25em] text-[#ff4c0f]">01 / Made for momentum</p>
+            <div><h2 className="max-w-3xl text-4xl font-black uppercase leading-[.9] tracking-[-.06em] sm:text-6xl">From first thought to clear next step.</h2><p className="mt-6 max-w-xl text-base leading-relaxed text-black/60">A calmer place for async reviews, product walkthroughs, and decisions that should not be lost in a thread.</p></div>
+          </div>
+          <div className="grid divide-y divide-black/15 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {[['01','Capture the context','Screen, camera, and voice — together in one frictionless recording.'],['02','Let Opal organize','AI summaries and transcripts turn a recording into a page your team can scan.'],['03','Move with clarity','Timestamped comments keep feedback attached to the exact moment it matters.']].map(([number,title,copy]) => <article key={number} className="group py-9 md:px-7 md:first:pl-0 md:last:pr-0"><span className="font-mono text-xs text-[#ff4c0f]">{number}</span><h3 className="mt-14 text-2xl font-black uppercase leading-none tracking-[-.05em] transition-transform duration-300 group-hover:translate-x-1">{title}</h3><p className="mt-4 text-sm leading-relaxed text-black/60">{copy}</p></article>)}
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow" className="bg-[#ff4c0f] px-6 py-20 text-black sm:py-28">
+        <div className="mx-auto grid max-w-6xl items-end gap-10 lg:grid-cols-[1.25fr_.75fr]"><div><p className="font-mono text-[10px] font-bold uppercase tracking-[.25em]">03 / Built for a better handoff</p><h2 className="mt-6 text-5xl font-black uppercase leading-[.86] tracking-[-.07em] sm:text-7xl">Say less.<br />Show more.</h2></div><div><p className="max-w-md text-base leading-relaxed text-black/70">Bring your team into the picture with a recording that holds the full context—then let the conversation move the work forward.</p><Link href="/auth/sign-up" className="mt-7 inline-flex items-center gap-2 rounded-full bg-black px-5 py-3 text-xs font-bold uppercase tracking-wide text-white transition-transform hover:scale-105">Create your workspace <ArrowUpRight size={15}/></Link></div></div>
+      </section>
+
+      <footer className="bg-black px-6 pb-8 pt-16 text-white"><div className="mx-auto max-w-6xl"><div className="flex flex-col justify-between gap-8 border-b border-white/10 pb-16 sm:flex-row"><div><p className="text-4xl font-black uppercase tracking-[-.07em]">Opal</p><p className="mt-3 max-w-xs text-sm text-white/45">Give your best thinking a place to be seen.</p></div><div className="grid grid-cols-2 gap-x-14 gap-y-3 text-sm text-white/60"><a href="#how-it-works">How it works</a><Link href="/services">Services</Link><Link href="/pricing">Pricing</Link><Link href="/auth/sign-up">Get started</Link></div></div><div className="flex justify-between pt-6 font-mono text-[10px] uppercase tracking-[.18em] text-white/35"><span>© {new Date().getFullYear()} Opal</span><a href="#top">Back to top ↑</a></div></div></footer>
     </>
   );
 };

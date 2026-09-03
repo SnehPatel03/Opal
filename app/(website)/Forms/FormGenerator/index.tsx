@@ -58,7 +58,7 @@ const FormGenerator = ({
             type={type}
             placeholder={placeholder}
             {...register(name)}
-            className="h-11 border-zinc-800 bg-zinc-900 focus-visible:ring-zinc-700"
+            className="h-11 rounded-xl border-white/[.1] bg-white/[.045] text-white shadow-[inset_0_1px_rgba(255,255,255,.05)] placeholder:text-white/30 focus-visible:border-[#ff4c0f]/70 focus-visible:ring-[#ff4c0f]/15"
           />
 
           {error && (
@@ -77,7 +77,7 @@ const FormGenerator = ({
             rows={lines}
             placeholder={placeholder}
             {...register(name)}
-            className="border-zinc-800 bg-zinc-900 focus-visible:ring-zinc-700"
+            className="rounded-xl border-white/[.1] bg-white/[.045] text-white shadow-[inset_0_1px_rgba(255,255,255,.05)] placeholder:text-white/30 focus-visible:border-[#ff4c0f]/70 focus-visible:ring-[#ff4c0f]/15"
           />
 
           {error && (
@@ -92,11 +92,11 @@ const FormGenerator = ({
           <Label>{label}</Label>
 
           <Select>
-            <SelectTrigger className="h-11 border-zinc-800 bg-zinc-900 focus:ring-zinc-700">
+            <SelectTrigger className="h-11 rounded-xl border-white/[.1] bg-white/[.045] focus:ring-[#ff4c0f]/15">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
 
-            <SelectContent className="border-zinc-800 bg-zinc-900">
+            <SelectContent className="border-white/[.1] bg-[#18181b]/95 backdrop-blur-xl">
               {options?.map((option) => (
                 <SelectItem key={option.id} value={option.value}>
                   {option.label}

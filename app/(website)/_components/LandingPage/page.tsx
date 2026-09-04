@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import {
   ArrowUpRight,
@@ -32,11 +33,8 @@ const RecordingControlBar = () => {
 
   return (
     <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-2 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
-      <div className="flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1.5">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
-        <span className="font-mono text-[11px] font-medium text-white/80">
-          04:12
-        </span>
+      <div className="flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-3">
+        <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" />
       </div>
 
       <button
@@ -228,18 +226,7 @@ const LandingPage = () => {
           <div className="flex items-center justify-center lg:justify-end">
             <div className="relative w-full max-w-[440px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] p-1.5 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.8)] backdrop-blur-xl">
               
-              {/* Browser/App Top Bar */}
-              <div className="flex items-center gap-2 border-b border-white/5 px-4 py-2.5">
-                <div className="flex gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
-                </div>
-                <div className="ml-2 flex-1 truncate rounded-md bg-white/5 px-3 py-1 text-center text-[11px] font-medium text-white/40">
-                  app.opal.com/workspace/recording-01
-                </div>
-              </div>
-
+            
               {/* Main Visual Area */}
               <div className="relative h-[280px] w-full overflow-hidden rounded-xl bg-black/40">
                 {/* Dot-matrix Waveform Animation */}
@@ -253,15 +240,9 @@ const LandingPage = () => {
                     className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-black" 
                     style={{ background: AVATAR_COLORS[0] }}
                   >
-                    JD
+                    S
                   </div>
-                  <span className="text-[11px] font-medium text-white/80">Jordan Doe</span>
-                </div>
-
-                {/* Overlay: AI Transcribing badge */}
-                <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-2.5 py-1 backdrop-blur-xl">
-                  <Sparkles size={12} style={{ color: BRAND_ORANGE }} />
-                  <span className="text-[10px] font-medium text-white/70">AI Transcribing...</span>
+                  <span className="text-[11px] font-medium text-white/80">SnehPatel</span>
                 </div>
               </div>
 
@@ -290,23 +271,57 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section id="how-it-works" className="relative overflow-hidden bg-[#f3f1ed] px-6 py-24 text-[#121212] sm:py-32">
+      <section id="how-it-works" className="relative overflow-hidden bg-[#151516] px-6 py-24 text-white sm:py-32">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-10 border-b border-black/15 pb-12 lg:grid-cols-[.8fr_1.2fr]">
+          <div className="grid gap-10 border-b border-white/10 pb-12 lg:grid-cols-[.8fr_1.2fr]">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[.25em] text-[#ff4c0f]">01 / Made for momentum</p>
-            <div><h2 className="max-w-3xl text-4xl font-black uppercase leading-[.9] tracking-[-.06em] sm:text-6xl">From first thought to clear next step.</h2><p className="mt-6 max-w-xl text-base leading-relaxed text-black/60">A calmer place for async reviews, product walkthroughs, and decisions that should not be lost in a thread.</p></div>
+            <div><h2 className="max-w-3xl text-4xl font-black uppercase leading-[.9] tracking-[-.06em] sm:text-6xl">From first thought to clear next step.</h2><p className="mt-6 max-w-xl text-base leading-relaxed text-white/55">A calmer place for async reviews, product walkthroughs, and decisions that should not be lost in a thread.</p></div>
           </div>
-          <div className="grid divide-y divide-black/15 md:grid-cols-3 md:divide-x md:divide-y-0">
-            {[['01','Capture the context','Screen, camera, and voice — together in one frictionless recording.'],['02','Let Opal organize','AI summaries and transcripts turn a recording into a page your team can scan.'],['03','Move with clarity','Timestamped comments keep feedback attached to the exact moment it matters.']].map(([number,title,copy]) => <article key={number} className="group py-9 md:px-7 md:first:pl-0 md:last:pr-0"><span className="font-mono text-xs text-[#ff4c0f]">{number}</span><h3 className="mt-14 text-2xl font-black uppercase leading-none tracking-[-.05em] transition-transform duration-300 group-hover:translate-x-1">{title}</h3><p className="mt-4 text-sm leading-relaxed text-black/60">{copy}</p></article>)}
+          <div className="grid divide-y divide-white/10 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {[['01','Capture the context','Screen, camera, and voice — together in one frictionless recording.'],['02','Let Opal organize','AI summaries and transcripts turn a recording into a page your team can scan.'],['03','Move with clarity','Timestamped comments keep feedback attached to the exact moment it matters.']].map(([number,title,copy]) => <article key={number} className="group py-9 md:px-7 md:first:pl-0 md:last:pr-0"><span className="font-mono text-xs text-[#ff4c0f]">{number}</span><h3 className="mt-14 text-2xl font-black uppercase leading-none tracking-[-.05em] transition-transform duration-300 group-hover:translate-x-1">{title}</h3><p className="mt-4 text-sm leading-relaxed text-white/55">{copy}</p></article>)}
           </div>
         </div>
       </section>
 
       <section id="workflow" className="bg-[#ff4c0f] px-6 py-20 text-black sm:py-28">
-        <div className="mx-auto grid max-w-6xl items-end gap-10 lg:grid-cols-[1.25fr_.75fr]"><div><p className="font-mono text-[10px] font-bold uppercase tracking-[.25em]">03 / Built for a better handoff</p><h2 className="mt-6 text-5xl font-black uppercase leading-[.86] tracking-[-.07em] sm:text-7xl">Say less.<br />Show more.</h2></div><div><p className="max-w-md text-base leading-relaxed text-black/70">Bring your team into the picture with a recording that holds the full context—then let the conversation move the work forward.</p><Link href="/auth/sign-up" className="mt-7 inline-flex items-center gap-2 rounded-full bg-black px-5 py-3 text-xs font-bold uppercase tracking-wide text-white transition-transform hover:scale-105">Create your workspace <ArrowUpRight size={15}/></Link></div></div>
+        <div className="mx-auto grid max-w-6xl items-end gap-10 lg:grid-cols-[1.25fr_.75fr]"><div><p className="font-mono text-[10px] font-bold uppercase tracking-[.25em]">03 / Built for a better handoff</p><h2 className="mt-6 text-5xl font-black uppercase leading-[.86] tracking-[-.05em] sm:text-7xl">Say less.<br />Show more.</h2></div><div><p className="max-w-md text-base leading-relaxed text-black/70">Bring your team into the picture with a recording that holds the full context—then let the conversation move the work forward.</p><Link href="/auth/sign-up" className="mt-7 inline-flex items-center gap-2 rounded-full bg-black px-5 py-3 text-xs font-bold uppercase tracking-wide text-white transition-transform hover:scale-105">Create your workspace <ArrowUpRight size={15}/></Link></div></div>
       </section>
 
-      <footer className="bg-black px-6 pb-8 pt-16 text-white"><div className="mx-auto max-w-6xl"><div className="flex flex-col justify-between gap-8 border-b border-white/10 pb-16 sm:flex-row"><div><p className="text-4xl font-black uppercase tracking-[-.07em]">Opal</p><p className="mt-3 max-w-xs text-sm text-white/45">Give your best thinking a place to be seen.</p></div><div className="grid grid-cols-2 gap-x-14 gap-y-3 text-sm text-white/60"><a href="#how-it-works">How it works</a><Link href="/services">Services</Link><Link href="/pricing">Pricing</Link><Link href="/auth/sign-up">Get started</Link></div></div><div className="flex justify-between pt-6 font-mono text-[10px] uppercase tracking-[.18em] text-white/35"><span>© {new Date().getFullYear()} Opal</span><a href="#top">Back to top ↑</a></div></div></footer>
+      <footer className="overflow-hidden bg-black text-white">
+        <div className="mx-auto max-w-[1440px] px-5 pt-5 sm:px-8 sm:pt-7">
+          <div className="flex items-center justify-between gap-5 font-mono text-[8px] font-bold uppercase tracking-[.08em] text-white/45 sm:text-[9px]">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <Image
+                src="/logo.svg"
+                alt="Opal"
+                width={93}
+                height={40}
+                className="h-auto w-8 brightness-0 invert"
+              />
+              <nav className="hidden items-center gap-4 sm:flex">
+                <Link href="/services" className="transition-colors hover:text-[#ff784c]">Services</Link>
+                <Link href="/pricing" className="transition-colors hover:text-[#ff784c]">Pricing</Link>
+                <Link href="/auth/sign-in" className="transition-colors hover:text-[#ff784c]">Sign in</Link>
+              </nav>
+            </div>
+            <div className="flex items-center gap-3 sm:gap-5">
+              <span className="hidden sm:inline">Built for visible work</span>
+              <a href="#top" className="transition-colors hover:text-[#ff784c]">Back to top ↗</a>
+            </div>
+          </div>
+
+          <div className="mt-7 h-[clamp(7rem,18vw,16rem)] overflow-hidden border-t border-white/10 sm:mt-9">
+            <h2 className="translate-y-[-.08em] pt-2 text-center text-[clamp(10rem,28vw,25rem)] font-black uppercase leading-[.73] tracking-[-.12em] text-[#f4f4f0]">
+              Opal
+            </h2>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 py-4 font-mono text-[8px] uppercase tracking-[.16em] text-white/30 sm:text-[9px]">
+            <span>© {new Date().getFullYear()} Opal. All rights reserved.</span>
+            <span>Record the work behind the work</span>
+          </div>
+        </div>
+      </footer>
     </>
   );
 };

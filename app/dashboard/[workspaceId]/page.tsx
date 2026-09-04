@@ -9,6 +9,7 @@ import {
 
 import CreateFolders from "@/app/(website)/_components/CreateFolders";
 import Folders from "@/app/(website)/_components/Folders";
+import LibraryLoading from "@/app/(website)/_components/LibraryLoading";
 import Videos from "@/app/(website)/_components/videos";
 
 type Props = {
@@ -44,6 +45,7 @@ const WorkspacePage = async({ params }: Props) => {
 
         <TabsContent value="videos" className="pt-8">
           <div className="space-y-10">
+            <LibraryLoading workspaceId={workspaceId} />
             <Folders workspaceId={workspaceId} />
             <Videos
               workspaceId={workspaceId}

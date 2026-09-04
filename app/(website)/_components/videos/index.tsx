@@ -7,7 +7,6 @@ import { VideosProps } from "@/types/index.type";
 import { VideoIcon } from "lucide-react";
 import React from "react";
 import VideoCard from "./video-card.tsx";
-import LoadingComponent from "../loadingComponent";
 
 type Props = {
   folderId: string;
@@ -22,9 +21,7 @@ const Videos = ({ folderId , workspaceId , videoKey, limit }: Props) => {
   );
 
   if (isPending || !videoData) {
-    return (
-      <div className="flex min-h-80 items-center justify-center"><LoadingComponent /></div>
-    );
+    return null;
   }
 
   const { status: VideoStatus, data: videos } = videoData as VideosProps;

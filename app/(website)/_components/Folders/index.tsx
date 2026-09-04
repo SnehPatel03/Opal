@@ -8,7 +8,6 @@ import { ArrowRight, Folder as FolderIcon } from "lucide-react";
 import Folder from "./folder";
 import { useDispatch } from "react-redux";
 import { FOLDERS } from "@/redux/slices/folders";
-import LoadingComponent from "../loadingComponent";
 
 type Props = {
   workspaceId: string;
@@ -38,7 +37,7 @@ const Folders = ({ workspaceId }: Props) => {
   const { latestVariable }: any = useMutationDataState(["create-folders"]);
 
   if (isPending) {
-    return <div className="flex min-h-64 items-center justify-center"><LoadingComponent /></div>;
+    return null;
   }
 
   if (!data) {
@@ -60,11 +59,6 @@ const Folders = ({ workspaceId }: Props) => {
           <FolderIcon className="h-5 w-5 text-zinc-400" />
           <h2 className="text-xl font-semibold text-neutral-200">Folders</h2>
         </div>
-
-        <button className="flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white">
-          See all
-          <ArrowRight className="h-4 w-4" />
-        </button>
       </div>
 
       <section

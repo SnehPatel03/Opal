@@ -67,7 +67,7 @@ const Layout = async ({ params, children }: Props) => {
             <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
               <GlobalHeader workspace={hasAccess.data.workspace}/>
 
-              <main className="mt-6">{children}</main>
+              <main className="opal-in mt-6">{children}</main>
             </div>
           </div>
         </div>

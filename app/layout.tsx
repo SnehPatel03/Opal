@@ -5,7 +5,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "./components/theme-provider";
 import ReactQueryProvider from "./react-query";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/redux/Provider";
 
 const geist = Geist({
@@ -40,7 +40,7 @@ export default function RootLayout({
           >
             <ReactQueryProvider>
               <ReduxProvider>{children}</ReduxProvider>
-              <Toaster richColors position="top-right" />
+              <Toaster position="top-right" />
             </ReactQueryProvider>
           </ThemeProvider>
         </ClerkProvider>

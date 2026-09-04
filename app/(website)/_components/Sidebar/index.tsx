@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { PlusCircle, Trash2, X } from "lucide-react";
@@ -28,6 +33,7 @@ import { useDispatch } from "react-redux";
 import { WORKSPACES } from "@/redux/slices/workspaces";
 import PaymentButton from "../Payment-Button";
 import { useMutationData } from "@/hooks/useMutationData";
+import Link from "next/link";
 
 type Props = {
   activeWorkspaceId: string;
@@ -38,7 +44,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const pathname = usePathname();
   const dispatch = useDispatch();
 
-
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -46,11 +51,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
-  const { data, isFetched } = userQueryData(
-    ["user-workspaces"],
-    getWorkspaces,
-  );
+  const { data, isFetched } = userQueryData(["user-workspaces"], getWorkspaces);
   const { data: workspace } = data as WorkspaceProps;
 
   useEffect(() => {
@@ -84,15 +85,23 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
   const currentWorkspace = workspace?.workspace.find(
     (workspace) => workspace.id === activeWorkspaceId,
   );
-  const { mutate: removeWorkspace, isPending: isDeletingWorkspace } = useMutationData(
-    ["delete-workspace"],
-    () => deleteWorkspace(activeWorkspaceId),
-    "user-workspaces",
-    () => router.push(`/dashboard/${workspace?.workspace.find((item) => item.type === "PERSONAL")?.id ?? ""}`),
-  );
+  const { mutate: removeWorkspace, isPending: isDeletingWorkspace } =
+    useMutationData(
+      ["delete-workspace"],
+      () => deleteWorkspace(activeWorkspaceId),
+      "user-workspaces",
+      () =>
+        router.push(
+          `/dashboard/${workspace?.workspace.find((item) => item.type === "PERSONAL")?.id ?? ""}`,
+        ),
+    );
 
   const handleDeleteWorkspace = () => {
-    if (window.confirm(`Delete “${currentWorkspace?.name}”? Its folders, videos, and workspace members will be removed.`)) {
+    if (
+      window.confirm(
+        `Delete “${currentWorkspace?.name}”? Its folders, videos, and workspace members will be removed.`,
+      )
+    ) {
       removeWorkspace({});
     }
   };
@@ -119,17 +128,113 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
   const sidebarContent = (
     <aside className="opal-sidebar flex h-screen w-68 flex-col overflow-hidden border-r border-white/[0.08] text-neutral-200">
-      <div className="flex items-center justify-center gap-2 border-b border-white/[0.08] py-5 px-4">
-        <Image
-          src="/logo.svg"
-          alt="Opal Logo"
-          width={32}
-          height={32}
-          priority
-        />
-        <h1 className="text-2xl font-black tracking-[-.06em]">Opal</h1>
-      </div>
+    
+    <Link
+  href="/"
+  className="
+    group relative flex h-[73px] shrink-0 cursor-pointer
+    items-center justify-center overflow-hidden
+    border-b border-white/[0.08]
+    px-5
+    transition-all duration-500
+    ease-[cubic-bezier(0.22,1,0.36,1)]
+    hover:border-[#ff4c0f]
+  "
+>
 
+  <div
+    className="
+      absolute inset-0
+      origin-left scale-x-0
+      bg-[#ff4c0f]
+      transition-transform duration-500
+      ease-[cubic-bezier(0.22,1,0.36,1)]
+      group-hover:scale-x-100
+    "
+  />
+
+  {/* Content */}
+  <div className="relative z-10 flex h-full w-full justify-center items-center">
+
+    {/* Logo */}
+    <Image
+      src="/logo.svg"
+      alt="Opal Logo"
+      width={72}
+      height={72}
+      priority
+      className="
+        shrink-0
+        transition-all duration-300
+        ease-[cubic-bezier(0.22,1,0.36,1)]
+        group-hover:scale-0
+        group-hover:opacity-0
+        group-hover:-rotate-45
+      "
+    />
+
+
+    <span
+      className="
+  pointer-events-none
+  absolute left-0
+
+  translate-x-[-40px]
+  translate-y-[3px]
+  scale-x-[0.9]
+  scale-y-[1.02]
+  rotate-[-3deg]
+
+  font-black
+  uppercase
+  leading-[0.72]
+  tracking-[-0.14em]
+
+  text-[4rem]
+  text-black
+
+  opacity-0
+
+  transition-all
+  duration-500
+  ease-[cubic-bezier(0.16,1,0.3,1)]
+
+  group-hover:translate-x-0
+  group-hover:translate-y-0
+  group-hover:scale-x-100
+  group-hover:scale-y-100
+  group-hover:rotate-[-2deg]
+  group-hover:opacity-100
+"
+    >
+      OPAL
+    </span>
+  </div>
+  <span
+    className="
+      absolute right-5 z-10
+      translate-x-4
+      -translate-y-1
+      rotate-[-20deg]
+
+      text-[25px]
+      font-black
+      text-black
+
+      opacity-0
+
+      transition-all duration-500
+      ease-[cubic-bezier(0.22,1,0.36,1)]
+
+      group-hover:translate-x-0
+      group-hover:translate-y-0
+      group-hover:rotate-0
+      group-hover:opacity-100
+    "
+  >
+    ↗
+  </span>
+</Link>
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
         <Select
           value={selectedWorkspaceId}
@@ -175,7 +280,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
           </SelectContent>
         </Select>
 
-
         {mounted &&
           currentWorkspace?.type === "PUBLIC" &&
           workspace?.subscription?.plan === "PRO" && (
@@ -204,7 +308,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         </div>
 
         <nav className="mt-1">
-          <ul className="space-y-0.5">
+          <ul className="space-y-1 opal-stagger">
             {menuItems.map((item) => (
               <SidebarItem
                 key={item.title}
@@ -258,8 +362,14 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         )}
 
         {mounted && currentWorkspace?.type === "PUBLIC" && (
-          <button type="button" onClick={handleDeleteWorkspace} disabled={isDeletingWorkspace} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-white/[.08] bg-white/[.025] px-3 py-2 text-xs font-medium text-white/40 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-200 disabled:opacity-50">
-            <Trash2 size={14} /> {isDeletingWorkspace ? "Deleting workspace…" : "Delete workspace"}
+          <button
+            type="button"
+            onClick={handleDeleteWorkspace}
+            disabled={isDeletingWorkspace}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-white/[.08] bg-white/[.025] px-3 py-2 text-xs font-medium text-white/40 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-200 disabled:opacity-50"
+          >
+            <Trash2 size={14} />{" "}
+            {isDeletingWorkspace ? "Deleting workspace…" : "Delete workspace"}
           </button>
         )}
 
@@ -268,22 +378,22 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             className="mt-auto"
             title="Upgrade to Pro"
             description="Unlock AI Features like transcription, AI Summary and effortless collaboration."
-            footer={
-              <PaymentButton/>
-            }
+            footer={<PaymentButton />}
           />
         )}
 
         {/* This block is already safe because it only depends on workspace, but we include it in mounted for consistency */}
-        {mounted && workspace?.workspace.length === 1 && workspace.members.length === 0 && (
-          <div className="w-full">
-            <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
-              {workspace.subscription?.plan === "FREE"
-                ? "Upgrade to Create Workspaces."
-                : ""}
-            </p>
-          </div>
-        )}
+        {mounted &&
+          workspace?.workspace.length === 1 &&
+          workspace.members.length === 0 && (
+            <div className="w-full">
+              <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
+                {workspace.subscription?.plan === "FREE"
+                  ? "Upgrade to Create Workspaces."
+                  : ""}
+              </p>
+            </div>
+          )}
       </div>
     </aside>
   );

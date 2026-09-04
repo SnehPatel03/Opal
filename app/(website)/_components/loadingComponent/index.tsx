@@ -2,17 +2,54 @@
 
 import { motion } from "framer-motion";
 
-type Props = { label?: string; fullPage?: boolean };
+type Props = {
+  label?: string;
+  fullPage?: boolean;
+  overlay?: boolean;
+};
 
-/** A deliberately quiet loading state for in-app data and route transitions. */
-const LoadingComponent = ({ label = "Loading", fullPage = false }: Props) => (
-  <div className={`flex items-center justify-center gap-2.5 ${fullPage ? "min-h-screen" : "py-8"}`} role="status" aria-live="polite">
-    <div className="flex items-end gap-1" aria-hidden>
-      {[0, 1, 2].map((dot) => (
-        <motion.span key={dot} className="h-1.5 w-1.5 rounded-full bg-[#ff4c0f]" animate={{ opacity: [0.25, 1, 0.25], y: [0, -3, 0] }} transition={{ duration: 0.7, delay: dot * 0.12, repeat: Infinity, ease: "easeInOut" }} />
+const LoadingComponent = ({
+  label = "Loading",
+  fullPage = false,
+  overlay = false,
+}: Props) => (
+  <div
+    role="status"
+    aria-live="polite"
+    className={[
+      "flex flex-col items-center justify-center gap-2",
+      fullPage ? "min-h-screen" : "py-4",
+      overlay
+        ? "fixed inset-0 z-100 bg-[#0b0b0c]/70 backdrop-blur-xl"
+        : "",
+    ].join(" ")}
+  >
+    {/* ONLY THESE BARS ANIMATE */}
+    <div
+      className="flex h-[12px] w-[14px] items-end justify-center gap-[3px]"
+      aria-hidden
+    >
+      {[0, 1, 2, 3].map((bar) => (
+        <motion.span
+          key={bar}
+          className="block w-[2px] rounded-full bg-[#ff4c0f]/75"
+          animate={{
+            height: [3, 10, 3],
+          }}
+          transition={{
+            duration: 0.7,
+            delay: bar * 0.08,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       ))}
     </div>
-    <span className="font-mono text-[10px] font-bold uppercase tracking-[.2em] text-white/40">{label}</span>
+
+    {/* COMPLETELY STATIC */}
+    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">
+      {label}
+    </span>
   </div>
 );
 

@@ -2,41 +2,45 @@
 
 import { Menu, Upload, Video } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import SearchBar from "../SearchBar";
 
 const TopNavbar = () => {
-  return (
-    <header className="sticky top-0 z-30 flex h-14 md:h-[57.5px] items-center border-b border-white/[0.08] bg-[#0b0b0c]/85 px-3 md:px-6 backdrop-blur-xl">
-      <div className="flex flex-1 items-center gap-2 md:gap-4 min-w-0">
-        <button
-          onClick={() => window.dispatchEvent(new Event("open-sidebar"))}
-          className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-neutral-200 lg:hidden"
-        >
-          <Menu size={20} />
-        </button>
+  const pathname = usePathname();
+  // The Library is the workspace's index route; keep search out of Home and
+  // every other workspace section.
+  const showSearch = /^\/dashboard\/[^/]+\/?$/.test(pathname);
 
-        <div className="flex-1 min-w-0">
-          <SearchBar placeholder="Search for people, projects..." />
-        </div>
+  return (
+    <header className="opal-fade sticky top-0 z-30 flex h-[73px] shrink-0 items-center gap-3 border-b border-white/[0.08] bg-[#0b0b0c]/70 px-4 backdrop-blur-2xl backdrop-saturate-150 md:px-6">
+      <button
+        onClick={() => window.dispatchEvent(new Event("open-sidebar"))}
+        className="rounded-lg p-2 text-zinc-400 transition hover:bg-white/[.08] hover:text-neutral-100 lg:hidden"
+      >
+        <Menu size={20} />
+      </button>
+
+      <div className="flex min-w-0 flex-1 items-center">
+        {showSearch ? (
+          <div className="w-full max-w-xl opal-fade">
+            <SearchBar placeholder="Search your library..." />
+          </div>
+        ) : null}
       </div>
 
-      <div className="ml-2 flex items-center gap-2 md:gap-3 shrink-0">
-        <button className="flex h-9 md:h-9 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.05] px-3 md:px-5 text-sm font-medium text-zinc-200 transition-all duration-200 hover:border-white/30 hover:bg-white/[0.1] hover:text-white">
-          <Upload size={15} className="text-zinc-400" />
+      <div className="flex shrink-0 items-center gap-2 md:gap-3">
+        <button className="btn-fill flex h-10 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.05] px-4 text-sm font-medium text-zinc-200 backdrop-blur-xl">
+          <Upload size={15} />
           <span className="hidden sm:inline">Upload</span>
         </button>
 
-        <button className="flex h-9 md:h-9 items-center justify-center gap-2 rounded-xl border border-[#ff4c0f]/70 bg-[#ff4c0f] px-3 md:px-5 text-sm font-bold text-black transition-all duration-200 hover:scale-[1.03] hover:bg-[#ff6840] hover:text-black">
-          <Video size={15} className="text-black" />
+        <button className="btn-fill flex h-10 items-center justify-center gap-2 rounded-xl border border-[#ff4c0f]/70 bg-[#ff4c0f]/[.14] px-4 text-sm font-bold text-[#ff8a5c]">
+          <Video size={15} />
           <span className="hidden sm:inline">Record</span>
         </button>
 
         <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "h-10 w-10 md:h-13 md:w-13 ring-1 ring-zinc-700",
-            },
-          }}
+          appearance={{ elements: { avatarBox: "h-10 w-10 ring-1 ring-white/15" } }}
         />
       </div>
     </header>

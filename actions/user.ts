@@ -4,8 +4,6 @@ import { sendEmail } from "@/helper/sendMail";
 import { prisma } from "@/lib/prisma";
 
 import { currentUser } from "@clerk/nextjs/server";
-import nodemailer from "nodemailer";
-import { use } from "react";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);

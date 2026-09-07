@@ -1,6 +1,10 @@
+"use client";
+
 import { Sparkles, FileText, Bot } from "lucide-react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useSubscription } from "@/hooks/use-subscription";
+import { toast } from "sonner";
 
 type Props = {
   plan: "PRO" | "FREE";
@@ -8,7 +12,34 @@ type Props = {
   videoId: string;
 };
 
-const AiTools = ({ plan, trial, videoId }: Props) => {
+const AiTools = ({ plan }: Props) => {
+  const isFreePlan = plan === "FREE";
+  const subscription = useSubscription();
+  const isProcessing = subscription?.isProcessing ?? false;
+
+  const showUpgradeMessage = () => {
+    toast.error("Upgrade your plan to use AI tools.", {
+      description: "AI summaries, descriptions, and the AI Assistant are available on Pro.",
+    });
+  };
+
+  const tools = [
+    {
+      label: "Generate Summary",
+      description: "AI creates a concise summary.",
+      icon: Sparkles,
+    },
+    {
+      label: "Generate Description",
+      description: "Create a professional description.",
+      icon: FileText,
+    },
+    {
+      label: "AI Assistant",
+      description: "Ask questions about your video.",
+      icon: Bot,
+    },
+  ];
 
 return (
   <TabsContent
@@ -23,73 +54,45 @@ return (
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
+      {isFreePlan ? (
         <Button
           size="sm"
-          variant="secondary"
-          className="h-7 rounded-md border border-white/[.1] bg-white/[.06] px-3 text-xs text-white hover:bg-white/[.12]"
-        >
-          Try Now
-        </Button>
-
-        <Button
-          size="sm"
+          onClick={() => void subscription?.onSubscribe()}
+          disabled={isProcessing}
           className="h-7 rounded-md bg-[#ff4c0f] px-3 text-xs text-black hover:bg-[#ff6840]"
         >
-          Upgrade
+          {isProcessing ? "Processing..." : "Upgrade"}
         </Button>
-      </div>
+      ) : (
+        <span className="pt-1 text-xs font-medium text-white/55">Active plan</span>
+      )}
     </div>
 
     {/* AI Tools */}
     <div className="space-y-2">
-      <button className="group flex w-full items-center gap-3 rounded-xl border border-white/[.08] bg-white/[.035] p-3 transition-all duration-200 hover:border-[#ff4c0f]/60 hover:bg-white/[.08]">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#ff4c0f]/12 transition group-hover:bg-[#ff4c0f]">
-          <Sparkles className="h-4 w-4 text-[#ff784c] transition group-hover:text-black" />
-        </div>
+      {tools.map(({ label, description, icon: Icon }) => (
+        <button
+          key={label}
+          type="button"
+          aria-disabled={isFreePlan}
+          title={isFreePlan ? "Upgrade your plan to use this AI tool" : undefined}
+          onClick={isFreePlan ? showUpgradeMessage : undefined}
+          className={`group flex w-full items-center gap-3 rounded-xl border p-3 transition-all duration-200 ${
+            isFreePlan
+              ? "cursor-not-allowed border-white/[.06] bg-white/[.02] opacity-50"
+              : "border-white/[.08] bg-white/[.035] hover:border-[#ff4c0f]/60 hover:bg-white/[.08]"
+          }`}
+        >
+          <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-[#ff4c0f]/12 transition ${!isFreePlan ? "group-hover:bg-[#ff4c0f]" : ""}`}>
+            <Icon className={`h-4 w-4 text-[#ff784c] transition ${!isFreePlan ? "group-hover:text-black" : ""}`} />
+          </div>
 
-        <div className="flex-1 text-left">
-          <p className="text-sm font-medium text-white">
-            Generate Summary
-          </p>
-
-          <p className="mt-0.5 text-xs text-white/45">
-            AI creates a concise summary.
-          </p>
-        </div>
-      </button>
-
-      <button className="group flex w-full items-center gap-3 rounded-xl border border-white/[.08] bg-white/[.035] p-3 transition-all duration-200 hover:border-[#ff4c0f]/60 hover:bg-white/[.08]">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#ff4c0f]/12 transition group-hover:bg-[#ff4c0f]">
-          <FileText className="h-4 w-4 text-[#ff784c] transition group-hover:text-black" />
-        </div>
-
-        <div className="flex-1 text-left">
-          <p className="text-sm font-medium text-white">
-            Generate Description
-          </p>
-
-          <p className="mt-0.5 text-xs text-white/45">
-            Create a professional description.
-          </p>
-        </div>
-      </button>
-
-      <button className="group flex w-full items-center gap-3 rounded-xl border border-white/[.08] bg-white/[.035] p-3 transition-all duration-200 hover:border-[#ff4c0f]/60 hover:bg-white/[.08]">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#ff4c0f]/12 transition group-hover:bg-[#ff4c0f]">
-          <Bot className="h-4 w-4 text-[#ff784c] transition group-hover:text-black" />
-        </div>
-
-        <div className="flex-1 text-left">
-          <p className="text-sm font-medium text-white">
-            AI Assistant
-          </p>
-
-          <p className="mt-0.5 text-xs text-white/45">
-            Ask questions about your video.
-          </p>
-        </div>
-      </button>
+          <div className="flex-1 text-left">
+            <p className="text-sm font-medium text-white">{label}</p>
+            <p className="mt-0.5 text-xs text-white/45">{description}</p>
+          </div>
+        </button>
+      ))}
     </div>
   </TabsContent>
 );

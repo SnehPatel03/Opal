@@ -439,9 +439,6 @@ export const moveVideoLocation = async (
 export const getPreviewVideo = async (videoId: string) => {
   try {
     const user = await currentUser();
-    if (!user) {
-      return { status: 404 };
-    }
 
     const video = await prisma.video.findUnique({
       where: {
@@ -481,10 +478,12 @@ export const getPreviewVideo = async (videoId: string) => {
       return {
         status: 200,
         data: video,
-        author: user.id == video.User?.clerkid ? true : false,
+        author: user?.id === video.User?.clerkid,
         relativeDate: daysAgo < 1 ? "Today" : `${daysAgo} days ago`,
       };
     }
+
+    return { status: 404 };
   } catch (error) {
     return { status: 500, data: "oops! Something went wrong" };
   }

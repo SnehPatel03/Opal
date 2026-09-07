@@ -242,7 +242,7 @@ const LandingPage = () => {
                   >
                     S
                   </div>
-                  <span className="text-[11px] font-medium text-white/80">SnehPatel</span>
+                  <span className="text-[11px] font-medium text-white/80">SP</span>
                 </div>
               </div>
 

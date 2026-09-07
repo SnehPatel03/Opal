@@ -242,28 +242,49 @@ body {
     0 0 0 1px rgba(255,76,15,.12),
     0 20px 60px -18px rgba(255,76,15,.35);
 }
-
-/* Hover fill that sweeps in from the corner */
 .btn-fill {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  transition: color .28s ease, border-color .28s ease, transform .2s cubic-bezier(.2,.8,.3,1);
+  border-radius: 10px;
+
+  transition:
+    color 0.4s ease,
+    border-color 0.4s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .btn-fill::before {
   content: "";
   position: absolute;
-  inset: 0;
   z-index: -1;
-  background: linear-gradient(135deg, #ff6a2a, #ff4c0f 60%, #d63b06);
-  transform: translate(-101%, -101%) rotate(0.001deg);
-  transition: transform .45s cubic-bezier(.65,0,.35,1);
+
+  width: 220%;
+  height: 220%;
+
+  right: -120%;
+  bottom: -120%;
+
+  border-radius: 50%;
+
+  background: #ff4c0f;
+
+  transform: scale(0);
+  transform-origin: bottom right;
+
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.btn-fill:hover::before, .btn-fill:focus-visible::before { transform: translate(0,0); }
-.btn-fill:hover { color: #0b0b0c; border-color: transparent; transform: translateY(-1px); }
-.btn-fill-invert:hover { color: #fff; }
-.btn-fill-invert::before { background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(235,235,235,.9)); }
-.btn-fill-invert:hover { color: #0b0b0c; }
+
+.btn-fill:hover::before,
+.btn-fill:focus-visible::before {
+  transform: scale(1);
+}
+
+.btn-fill:hover {
+  color: #0b0b0c;
+  border-color: #ff4c0f;
+  transform: translateY(-1px);
+}
 
 /* Entrance transitions — kills post-load flicker */
 @keyframes opal-in { from { opacity: 0; transform: translate3d(0, 10px, 0) scale(.99); } to { opacity: 1; transform: none; } }

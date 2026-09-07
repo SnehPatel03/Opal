@@ -389,7 +389,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             <div className="w-full">
               <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
                 {workspace.subscription?.plan === "FREE"
-                  ? "Upgrade to Create Workspaces."
+                  ? ""
                   : ""}
               </p>
             </div>

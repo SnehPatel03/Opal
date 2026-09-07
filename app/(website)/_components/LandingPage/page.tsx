@@ -222,19 +222,13 @@ const LandingPage = () => {
             </ol>
           </div>
 
-          {/* Right Column: Interactive UI Element */}
           <div className="flex items-center justify-center lg:justify-end">
             <div className="relative w-full max-w-[440px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] p-1.5 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.8)] backdrop-blur-xl">
               
-            
-              {/* Main Visual Area */}
               <div className="relative h-[280px] w-full overflow-hidden rounded-xl bg-black/40">
-                {/* Dot-matrix Waveform Animation */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <WaveformCanvas />
                 </div>
-
-                {/* Overlay: Active camera bubble */}
                 <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 py-1 pl-1 pr-3 backdrop-blur-xl">
                   <div 
                     className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-black" 

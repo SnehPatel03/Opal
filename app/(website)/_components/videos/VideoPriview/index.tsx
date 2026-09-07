@@ -5,9 +5,10 @@ import { sendEmailForFirstView } from "@/actions/user";
 import { userQueryData } from "@/hooks/userQueryData";
 import { truncateString } from "@/lib/utils";
 import { VideoProps } from "@/types/index.type";
-import { Download, Eye, MessageSquareText, Play, Sparkles } from "lucide-react";
+import { Download, Eye, MessageSquareText, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import ActivityPage from "../../Activity";
 import AiTools from "../../AI-Tools ";
 import CopyLink from "../../CopyLink";
@@ -20,7 +21,14 @@ type Props = { videoId: string };
 
 const VideoPriview = ({ videoId }: Props) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const hasNotifiedFirstView = useRef(false);
+  const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [trimError, setTrimError] = useState("");
   const { data } = userQueryData(
     ["preview-video", videoId],
     () => getPreviewVideo(videoId),
@@ -52,6 +60,47 @@ const VideoPriview = ({ videoId }: Props) => {
   const author =
     `${video.User?.firstname ?? ""} ${video.User?.lastname ?? ""}`.trim() ||
     "Opal member";
+  const canEdit = Boolean(result?.author);
+  const canRevert = Boolean(video.originalVideoUrl);
+
+  const handleTrim = async () => {
+    setTrimError("");
+    if (!duration || startTime < 0 || endTime <= startTime || endTime > duration) {
+      setTrimError("Choose a range inside the video duration.");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/videos/${videoId}/trim`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startTime, endTime }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "Unable to trim video");
+      await queryClient.invalidateQueries({ queryKey: ["preview-video", videoId] });
+      setIsEditing(false);
+    } catch (error) {
+      setTrimError(error instanceof Error ? error.message : "Unable to trim video");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRevert = async () => {
+    setTrimError("");
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/videos/${videoId}/trim`, { method: "DELETE" });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "Unable to revert video");
+      await queryClient.invalidateQueries({ queryKey: ["preview-video", videoId] });
+    } catch (error) {
+      setTrimError(error instanceof Error ? error.message : "Unable to revert video");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 sm:py-10">
@@ -92,9 +141,6 @@ const VideoPriview = ({ videoId }: Props) => {
               <span className="font-mono text-[10px] font-bold uppercase tracking-[.2em] text-white/35">
                 Now playing
               </span>
-              <div className="flex items-center gap-1.5 text-[10px] font-medium text-white/40">
-                <Sparkles size={12} className="text-[#ff784c]" /> AI-ready video
-              </div>
             </div>
             {hasPlayableSource ? (
               <video
@@ -104,9 +150,14 @@ const VideoPriview = ({ videoId }: Props) => {
                 disableRemotePlayback
                 preload="metadata"
                 playsInline
+                onLoadedMetadata={(event) => {
+                  const nextDuration = event.currentTarget.duration;
+                  setDuration(nextDuration);
+                  if (!endTime) setEndTime(nextDuration);
+                }}
                 className="aspect-video w-full bg-black"
               >
-                <source src={videoSource} type="video/webm" />
+                <source src={videoSource} />
                 Your browser does not support video playback.
               </video>
             ) : (
@@ -124,7 +175,73 @@ const VideoPriview = ({ videoId }: Props) => {
               </div>
             )}
           </section>
-          <section className="opal-panel rounded-[22px] p-5 sm:p-6">
+          {canEdit && hasPlayableSource && (
+            <section className="opal-panel rounded-[22px] p-5 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-bold text-white">Edit video</h2>
+                  <p className="mt-1 text-xs text-white/45">
+                    Trim the current video or restore the untouched original.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing((value) => !value)}
+                    className="rounded-xl border border-white/[.14] px-3 py-2 text-xs font-bold text-white transition hover:border-[#ff4c0f]"
+                  >
+                    {isEditing ? "Cancel" : "Trim"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRevert}
+                    disabled={isSaving || !canRevert}
+                    className="rounded-xl border border-white/[.14] px-3 py-2 text-xs font-bold text-white/70 transition hover:border-[#ff4c0f] disabled:opacity-50"
+                  >
+                    Revert
+                  </button>
+                </div>
+              </div>
+              {isEditing && (
+                <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                  <label className="text-xs text-white/55">
+                    Start (seconds)
+                    <input
+                      type="number"
+                      min="0"
+                      max={duration || undefined}
+                      step="0.1"
+                      value={startTime}
+                      onChange={(event) => setStartTime(Number(event.target.value))}
+                      className="mt-2 h-10 w-full rounded-xl border border-white/[.12] bg-black/30 px-3 text-sm text-white outline-none focus:border-[#ff4c0f]"
+                    />
+                  </label>
+                  <label className="text-xs text-white/55">
+                    End (seconds)
+                    <input
+                      type="number"
+                      min="0"
+                      max={duration || undefined}
+                      step="0.1"
+                      value={endTime}
+                      onChange={(event) => setEndTime(Number(event.target.value))}
+                      className="mt-2 h-10 w-full rounded-xl border border-white/[.12] bg-black/30 px-3 text-sm text-white outline-none focus:border-[#ff4c0f]"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleTrim}
+                    disabled={isSaving || !duration}
+                    className="h-10 rounded-xl bg-[#ff4c0f] px-4 text-xs font-black text-black transition hover:bg-[#ff784c] disabled:opacity-50"
+                  >
+                    {isSaving ? "Saving..." : "Apply trim"}
+                  </button>
+                </div>
+              )}
+              {trimError && <p className="mt-3 text-xs text-red-300">{trimError}</p>}
+            </section>
+          )}
+          <section className="opal-panel rounded-[22px] h-[240px] p-5 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ff4c0f]/15 text-[#ff784c]">
                 <MessageSquareText size={18} />

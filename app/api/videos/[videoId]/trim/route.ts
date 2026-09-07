@@ -24,7 +24,12 @@ export async function POST(
     const { videoId } = await params;
     const body = await req.json();
     const { startTime, endTime } = body;
-    if (typeof startTime !== "number" || typeof endTime !== "number") {
+    if (
+      typeof startTime !== "number" ||
+      typeof endTime !== "number" ||
+      !Number.isFinite(startTime) ||
+      !Number.isFinite(endTime)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -89,20 +94,27 @@ export async function POST(
       startTime,
       endTime,
     });
-    console.log("---------------------------------")
 
-    console.log("Trimmed FIle res : ", trimmedVideo);
-    
-    console.log("---------------------------------")
+    const updatedVideo = await prisma.video.update({
+      where: { id: video.id },
+      data: {
+        videoUrl: trimmedVideo.url,
+        fileId: trimmedVideo.fileId,
+        ...(video.originalVideoUrl
+          ? {}
+          : {
+              originalVideoUrl: video.videoUrl,
+              originalFileId: video.fileId,
+            }),
+      },
+    });
+
     return NextResponse.json({
       success: true,
       data: {
-        originalVideoId: video.id,
-        trimmedVideoUrl: trimmedVideo.url,
-        trimmedFileId: trimmedVideo.fileId,
+        video: updatedVideo,
         startTime,
         endTime,
-        originalFileId: video.fileId,
       },
     });
   } catch (error) {
@@ -112,6 +124,67 @@ export async function POST(
         success: false,
         message: "Something went wrong",
       },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ videoId: string }> },
+) {
+  try {
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json(
+        { success: false, message: "User Not Authorized" },
+        { status: 401 },
+      );
+    }
+
+    const { videoId } = await params;
+    const user = await prisma.user.findUnique({
+      where: { clerkid: clerkId },
+      select: { id: true },
+    });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User Not Exist!" },
+        { status: 403 },
+      );
+    }
+
+    const video = await prisma.video.findFirst({
+      where: { id: videoId, userId: user.id },
+    });
+    if (!video) {
+      return NextResponse.json(
+        { success: false, message: "No video found" },
+        { status: 404 },
+      );
+    }
+    if (!video.originalVideoUrl) {
+      return NextResponse.json(
+        { success: false, message: "Video has not been trimmed" },
+        { status: 409 },
+      );
+    }
+
+    const restoredVideo = await prisma.video.update({
+      where: { id: video.id },
+      data: {
+        videoUrl: video.originalVideoUrl,
+        fileId: video.originalFileId,
+        originalVideoUrl: null,
+        originalFileId: null,
+      },
+    });
+
+    return NextResponse.json({ success: true, data: { video: restoredVideo } });
+  } catch (error) {
+    console.error("Reverting video trim failed", error);
+    return NextResponse.json(
+      { success: false, message: "Something went wrong" },
       { status: 500 },
     );
   }

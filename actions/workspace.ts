@@ -452,7 +452,8 @@ export const getPreviewVideo = async (videoId: string) => {
         processing: true,
         views: true,
         summery: true,
-        videoUrl:true,
+        videoUrl: true,
+        originalVideoUrl: true,
         User: {
           select: {
             firstname: true,

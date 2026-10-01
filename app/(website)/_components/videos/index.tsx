@@ -45,7 +45,11 @@ const Videos = ({ folderId , workspaceId , videoKey, limit }: Props) => {
             : "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
         )}
       >
-        {VideoStatus == 200 ? (
+        {VideoStatus !== 200 ? (
+          <p className="text-zinc-400">No videos in workspace.</p>
+        ) : videos.length === 0 ? (
+          <p className="text-zinc-400">No videos in workspace.</p>
+        ) : (
           videos.slice(0, limit).map((video) =>
             <VideoCard 
               key={video.id} 
@@ -55,8 +59,6 @@ const Videos = ({ folderId , workspaceId , videoKey, limit }: Props) => {
               {...video}
             />
         )
-        ) : (
-          <p>No Videos In Workspace</p>
         )}
 
       </section>

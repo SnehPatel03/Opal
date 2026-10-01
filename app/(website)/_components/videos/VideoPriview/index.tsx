@@ -297,8 +297,8 @@ const VideoPriview = ({ videoId }: Props) => {
           </section>
           <section className="opal-panel rounded-[22px] p-3 sm:p-4">
             <TabsComponent
-              defaultValue="AI Tools"
-              triggers={["AI Tools", "Transcript"]}
+              defaultValue="PRO Tools"
+              triggers={["PRO Tools", "Transcript"]}
             >
               <AiTools
                 videoId={videoId}

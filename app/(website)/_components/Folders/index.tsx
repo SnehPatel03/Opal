@@ -77,7 +77,9 @@ const Folders = ({ workspaceId }: Props) => {
         )}
 
         {status !== 200 ? (
-          <p className="text-zinc-400">No folders in workspace.</p>
+          <p className="text-zinc-400">Unable to load folders.</p>
+        ) : foldersData.length === 0 ? (
+          <p className="text-zinc-400">No folders in workspace yet.</p>
         ) : (
           foldersData.map((folder) => (
             <Folder

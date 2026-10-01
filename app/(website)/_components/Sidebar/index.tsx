@@ -382,16 +382,10 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
           />
         )}
 
-        {/* This block is already safe because it only depends on workspace, but we include it in mounted for consistency */}
         {mounted &&
           workspace?.workspace.length === 1 &&
           workspace.members.length === 0 && (
             <div className="w-full">
-              <p className="text-[#3c3c3c] font-medium text-[14px] px-2 mt-2">
-                {workspace.subscription?.plan === "FREE"
-                  ? ""
-                  : ""}
-              </p>
             </div>
           )}
       </div>

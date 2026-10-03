@@ -1,26 +1,27 @@
-import nodemailer from "nodemailer";
+import { BrevoClient } from "@getbrevo/brevo";
 
-
-export const sendEmail = (
+export const sendEmail = async (
   to: string,
   subject: string,
   text: string,
   html?: string,
 ) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.MAILER_USER,
-      pass: process.env.MAILER_PASS,
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL;
+
+  if (!apiKey) throw new Error("BREVO_API_KEY is not configured");
+  if (!senderEmail) throw new Error("BREVO_SENDER_EMAIL is not configured");
+
+  const brevo = new BrevoClient({ apiKey });
+
+  return brevo.transactionalEmails.sendTransacEmail({
+    sender: {
+      name: "Opal",
+      email: senderEmail,
     },
-  });
-  const mailOptions = {
-    to,
+    to: [{ email: to }],
     subject,
-    text,
-    html,
-  };
-  return { transporter, mailOptions };
+    textContent: text,
+    ...(html && { htmlContent: html }),
+  });
 };

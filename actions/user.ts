@@ -349,7 +349,7 @@ export const inviteMember = async (
           },
         });
         if (invitation) {
-          const { transporter, mailOptions } = sendEmail(
+          const mailPromise = sendEmail(
             email,
             "You've Got a Workspace Invitation",
             `You are invited to the workspace "${workspace.name}". Click the link below to accept your invitation.`,
@@ -401,7 +401,7 @@ export const inviteMember = async (
           );
 
           try {
-            await transporter.sendMail(mailOptions);
+            await mailPromise;
             console.log("mail sent 😮‍💨 ");
           } catch (error) {
             console.log("🧐 Error aa gaya bapu", error);
@@ -527,7 +527,7 @@ export const sendEmailForFirstView = async (videoId: string) => {
           data: "No email found to sent!{Typicall bug in db design for mail send for first view}",
         };
 
-      const { transporter, mailOptions } = sendEmail(
+      const mailPromise = sendEmail(
         video.User?.email,
         " You got your first viewer on Opal!",
         `Your video "${video.title}" just received its first viewer.`,
@@ -535,7 +535,7 @@ export const sendEmailForFirstView = async (videoId: string) => {
       );
 
       try {
-        await transporter.sendMail(mailOptions);
+        await mailPromise;
         const notification = await prisma.user.update({
           where: {
             clerkid: user.id,

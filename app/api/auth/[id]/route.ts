@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -7,9 +7,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 )
 {
-  console.log("Endoint Hitted!!✅")
   try {
     const { id } = await params;
+    const { userId } = await auth({ acceptsToken: "session_token" });
+
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    if (userId !== id) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
 
     const userProfile = await prisma.user.findUnique({
       where: {

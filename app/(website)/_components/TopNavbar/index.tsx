@@ -3,6 +3,7 @@
 import { Menu, Upload, Video } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import SearchBar from "../SearchBar";
 
 const TopNavbar = () => {
@@ -29,10 +30,14 @@ const TopNavbar = () => {
       </div>
 
       <div className="flex shrink-0 items-center gap-2 md:gap-3">
-        <button className="btn-fill flex h-10 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.05] px-4 text-sm font-medium text-zinc-200 backdrop-blur-xl">
+        <Link
+          href="/download"
+          aria-label="Download the Opal desktop app"
+          className="btn-fill flex h-10 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.05] px-4 text-sm font-medium text-zinc-200 backdrop-blur-xl"
+        >
           <Upload size={15} />
           <span className="hidden sm:inline">Upload</span>
-        </button>
+        </Link>
 
         <button className="btn-fill flex h-10 items-center justify-center gap-2 rounded-xl border border-[#ff4c0f]/70 bg-[#ff4c0f]/[.14] px-4 text-sm font-bold text-[#ff8a5c]">
           <Video size={15} />

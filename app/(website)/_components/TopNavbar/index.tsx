@@ -36,7 +36,7 @@ const TopNavbar = () => {
           className="btn-fill flex h-10 items-center justify-center gap-2 rounded-xl border border-[#ff4c0f]/70 bg-[#ff4c0f]/[.14] px-4 text-sm font-bold text-[#ff8a5c]"
         >
           <Video size={15} />
-          <span className="hidden sm:inline">Video</span>
+          <span className="hidden sm:inline">Record</span>
         </Link>
 
         <UserButton

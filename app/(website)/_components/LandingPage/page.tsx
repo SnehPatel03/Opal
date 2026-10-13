@@ -311,7 +311,6 @@ const LandingPage = () => {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 py-4 font-mono text-[8px] uppercase tracking-[.16em] text-white/30 sm:text-[9px]">
-            <span>© {new Date().getFullYear()} Opal. All rights reserved.</span>
             <span>Record the work behind the work</span>
           </div>
         </div>

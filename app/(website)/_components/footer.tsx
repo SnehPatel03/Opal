@@ -71,7 +71,6 @@ const Footer = () => (
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 py-6 text-[11px] text-white/30">
-        <span>© {new Date().getFullYear()} Opal. All rights reserved.</span>
         <span className="font-mono uppercase tracking-[.22em]">Built for fast teams</span>
       </div>
     </div>
